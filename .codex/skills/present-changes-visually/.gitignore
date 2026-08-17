@@ -1,0 +1,4 @@
+_temp/
+__pycache__/
+*.py[cod]
+.DS_Store
