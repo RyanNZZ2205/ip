@@ -10,6 +10,8 @@ public class ErmActually {
      * @param args command-line arguments, which this application does not use
      */
     public static void main(String[] args) {
+
+
         String banner = "+----------------+\n"
                 + "|  Erm Actually  |\n"
                 + "+----------------+";
@@ -57,13 +59,51 @@ public class ErmActually {
 
                 System.out.println("oh? okay then I'll unmark it for you:");
                 System.out.println("  " + tasks[taskIndex]);
-            } else {
-                tasks[taskCount] = new Task(command);
+
+            } else if (command.startsWith("todo ")) {
+                String description = command.substring(5);
+                tasks[taskCount] = new Todo(description);
                 taskCount++;
-                System.out.println("added: " + command);
+                showTaskAdded(tasks[taskCount -1], taskCount);
+
+            } else if (command.startsWith("deadline ")) {
+                String[] parts = command.substring(9).split(" /by ", 2);
+
+                if (parts.length < 2) {
+                    System.out.println("Please add a deadline using /by.");
+                } else {
+                    tasks[taskCount] = new Deadline(parts[0], parts[1]);
+                    taskCount++;
+                    showTaskAdded(tasks[taskCount-1], taskCount);
+                }
+
+            } else if (command.startsWith("event ")) {
+                String[] fromParts = command.substring(6).split(" /from ", 2);
+
+                if (fromParts.length < 2) {
+                    System.out.println("Please add an event start time using /from.");
+                } else {
+                    String[] toParts = fromParts[1].split(" /to ", 2);
+
+                    if (toParts.length < 2) {
+                        System.out.println("Please add an event end time using /to.");
+                    } else {
+                        tasks[taskCount] = new Event(fromParts[0], toParts[0], toParts[1]);
+                        taskCount++;
+                        showTaskAdded(tasks[taskCount-1], taskCount);
+                    }
+                }
             }
 
             System.out.println(line);
         }
+    }
+
+    private static void showTaskAdded(Task task, int taskCount) {
+        System.out.println("____________________________________________________________");
+        System.out.println(" Got it. I've added this task:");
+        System.out.println("   " + task);
+        System.out.println(" Now you have " + taskCount + " tasks in the list.");
+        System.out.println("____________________________________________________________");
     }
 }
