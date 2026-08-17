@@ -62,32 +62,41 @@ public class ErmActually {
 
             //mark command
             else if (command.startsWith("mark ")) {
+                try {
+                    int taskNumber = Integer.parseInt(command.substring(5));
+                    int taskIndex = taskNumber - 1;
 
-                int taskNumber = Integer.parseInt(command.substring(5));
-                int taskIndex = taskNumber - 1;
+                    tasks.get(taskIndex).markAsDone();
 
-                tasks.get(taskIndex).markAsDone();
-
-                System.out.println(line);
-                System.out.println("oh! good job you've actually finished this task:");
-                System.out.println(" " + tasks.get(taskIndex));
-                System.out.println(line);
-
+                    System.out.println(line);
+                    System.out.println("oh! good job you've actually finished this task:");
+                    System.out.println(" " + tasks.get(taskIndex));
+                    System.out.println(line);
+                } catch (NumberFormatException e) {
+                    showError("Please provide a valid task number.");
+                } catch (IndexOutOfBoundsException e) {
+                    showError("That task number does not exist.");
+                }
             }
+
 
             //unmark command
             else if (command.startsWith("unmark ")) {
+                try {
+                    int taskNumber = Integer.parseInt(command.substring(7));
+                    int taskIndex = taskNumber - 1;
 
-                int taskNumber = Integer.parseInt(command.substring(7));
-                int taskIndex = taskNumber - 1;
+                    tasks.get(taskIndex).unmarkAsDone();
 
-                tasks.get(taskIndex).unmarkAsDone();
-
-                System.out.println(line);
-                System.out.println("oh? okay then I'll unmark it for you:");
-                System.out.println("  " + tasks.get(taskIndex));
-                System.out.println(line);
-
+                    System.out.println(line);
+                    System.out.println("oh? okay then I'll unmark it for you:");
+                    System.out.println("  " + tasks.get(taskIndex));
+                    System.out.println(line);
+                } catch (NumberFormatException e) {
+                    showError("Please provide a valid task number.");
+                } catch (IndexOutOfBoundsException e) {
+                    showError("That task number does not exist.");
+                }
             }
 
             //delete command
