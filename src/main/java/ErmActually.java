@@ -34,16 +34,21 @@ public class ErmActually {
         while (true) {
             String command = scanner.nextLine();
 
-            System.out.println(line);
             if (command.equals("bye")) {
+                System.out.println(line);
                 System.out.println(farewell);
                 System.out.println(line);
                 break;
             } else if (command.equals("list")) {
+                System.out.println(line);
+                System.out.println(" Here are the tasks in your list:");
                 for (int i = 0; i < taskCount; i++) {
-                    System.out.println((i + 1) + ". " + tasks[i]);
+                    System.out.println(" " + (i + 1) + ". " + tasks[i]);
                 }
+                System.out.println(line);
+
             } else if (command.startsWith("mark ")) {
+                System.out.println(line);
                 int taskNumber = Integer.parseInt(command.substring(5));
                 int taskIndex = taskNumber - 1;
 
@@ -51,7 +56,10 @@ public class ErmActually {
 
                 System.out.println("oh! good job you've actually finished this task:");
                 System.out.println(" " + tasks[taskIndex]);
+                System.out.println(line);
+
             } else if (command.startsWith("unmark ")) {
+                System.out.println(line);
                 int taskNumber = Integer.parseInt(command.substring(7));
                 int taskIndex = taskNumber - 1;
 
@@ -59,6 +67,7 @@ public class ErmActually {
 
                 System.out.println("oh? okay then I'll unmark it for you:");
                 System.out.println("  " + tasks[taskIndex]);
+                System.out.println(line);
 
             } else if (command.startsWith("todo ")) {
                 String description = command.substring(5);
@@ -93,17 +102,21 @@ public class ErmActually {
                         showTaskAdded(tasks[taskCount-1], taskCount);
                     }
                 }
+            } else {
+                System.out.println(line);
+                System.out.println(" " + command);
+                System.out.println(line);
+
             }
 
-            System.out.println(line);
         }
     }
 
     private static void showTaskAdded(Task task, int taskCount) {
         System.out.println("____________________________________________________________");
-        System.out.println(" Got it. I've added this task:");
+        System.out.println(" Alright! I've added this new task:");
         System.out.println("   " + task);
-        System.out.println(" Now you have " + taskCount + " tasks in the list.");
+        System.out.println(" Wow! you have " + taskCount + " tasks in the list.");
         System.out.println("____________________________________________________________");
     }
 }
