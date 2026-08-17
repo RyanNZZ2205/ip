@@ -11,7 +11,7 @@ public class Event extends Task {
      * @throws ErmActuallyException if a required value is empty
      */
     public Event(String description, String from, String to) throws ErmActuallyException {
-        super(validateDescription(description));
+        super(validateDescription(description), TaskType.EVENT);
         this.from = validateTime(from, "start time");
         this.to = validateTime(to, "end time");
     }
@@ -32,7 +32,7 @@ public class Event extends Task {
 
     @Override
     public String toString() {
-        return "[E]" + super.toString() + " (from: " + from + " to: " + to + ")";
+        return super.toString() + " (from: " + from + " to: " + to + ")";
     }
 }
 

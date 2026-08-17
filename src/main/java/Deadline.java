@@ -9,7 +9,7 @@ public class Deadline extends Task {
      * @throws ErmActuallyException if either required value is empty
      */
     public Deadline(String description, String by) throws ErmActuallyException {
-        super(validateDescription(description));
+        super(validateDescription(description), TaskType.DEADLINE);
         this.by = validateDeadline(by);
     }
 
@@ -29,6 +29,6 @@ public class Deadline extends Task {
 
     @Override
     public String toString() {
-        return "[D]" + super.toString() + " (by: " + by + ")";
+        return super.toString() + " (by: " + by + ")";
     }
 }

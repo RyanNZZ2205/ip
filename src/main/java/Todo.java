@@ -7,7 +7,7 @@ public class Todo extends Task {
      * @throws ErmActuallyException if the description is empty
      */
     public Todo(String description) throws ErmActuallyException {
-        super(validateDescription(description));
+        super(validateDescription(description), TaskType.TODO);
     }
 
     private static String validateDescription(String description) throws ErmActuallyException {
@@ -15,10 +15,5 @@ public class Todo extends Task {
             throw new ErmActuallyException("The description of a todo cannot be empty.");
         }
         return description.trim();
-    }
-
-    @Override
-    public String toString() {
-        return "[T]" + super.toString();
     }
 }

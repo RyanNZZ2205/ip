@@ -4,9 +4,11 @@
 public class Task {
     protected String description;
     protected boolean isDone;
+    protected TaskType taskType;
 
-    public Task(String description) {
+    public Task(String description, TaskType taskType) {
         this.description = description;
+        this.taskType = taskType;
         this.isDone = false;
     }
 
@@ -34,6 +36,6 @@ public class Task {
      */
     @Override
     public String toString() {
-        return "[" + getStatusIcon() + "] " + description;
+        return "[" + taskType.getSymbol() + "][" + getStatusIcon() + "] " + description;
     }
 }
