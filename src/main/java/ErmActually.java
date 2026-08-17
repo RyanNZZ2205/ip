@@ -1,4 +1,5 @@
 import java.util.Scanner;
+import java.util.ArrayList;
 
 /**
  * Starts ErmActually, which greets the user, echoes commands, and exits on {@code bye}.
@@ -27,96 +28,162 @@ public class ErmActually {
         System.out.println(line);
 
         Scanner scanner = new Scanner(System.in);
-        Task[] tasks = new Task[100];
-        int taskCount = 0;
-        while (true) {
-            String command = scanner.nextLine();
 
+        //Stores Task objects in a dynamically sized list
+        ArrayList<Task> tasks = new ArrayList<>();
+
+        while (true) {
+            String command = scanner.nextLine().trim();
+
+            //Bye Command
             if (command.equals("bye")) {
                 System.out.println(line);
                 System.out.println(farewell);
                 System.out.println(line);
                 break;
-            } else if (command.equals("list")) {
+            }
+
+            //List Command
+            else if (command.equals("list")) {
+
                 System.out.println(line);
                 System.out.println(" Here are the tasks in your list:");
-                for (int i = 0; i < taskCount; i++) {
-                    System.out.println(" " + (i + 1) + ". " + tasks[i]);
-                }
-                System.out.println(line);
 
-            } else if (command.startsWith("mark ")) {
+                if (tasks.isEmpty()) {
+                    System.out.println("Woohoo! No tasks found!");
+                } else {
+                    for (int i = 0; i < tasks.size(); i++) {
+                        System.out.println(" " + (i + 1) + ". " + tasks.get(i));
+                    }
+                }
+
                 System.out.println(line);
+            }
+
+            //mark command
+            else if (command.startsWith("mark ")) {
+
                 int taskNumber = Integer.parseInt(command.substring(5));
                 int taskIndex = taskNumber - 1;
 
-                tasks[taskIndex].markAsDone();
+                tasks.get(taskIndex).markAsDone();
 
+                System.out.println(line);
                 System.out.println("oh! good job you've actually finished this task:");
-                System.out.println(" " + tasks[taskIndex]);
+                System.out.println(" " + tasks.get(taskIndex));
                 System.out.println(line);
 
-            } else if (command.startsWith("unmark ")) {
-                System.out.println(line);
+            }
+
+            //unmark command
+            else if (command.startsWith("unmark ")) {
+
                 int taskNumber = Integer.parseInt(command.substring(7));
                 int taskIndex = taskNumber - 1;
 
-                tasks[taskIndex].unmarkAsDone();
+                tasks.get(taskIndex).unmarkAsDone();
 
+                System.out.println(line);
                 System.out.println("oh? okay then I'll unmark it for you:");
-                System.out.println("  " + tasks[taskIndex]);
+                System.out.println("  " + tasks.get(taskIndex));
                 System.out.println(line);
 
-            } else if (command.equals("todo") || command.startsWith("todo ")) {
-                String description = command.substring(4);
+            }
+
+            //todo command
+            else if (command.equals("todo") || command.startsWith("todo ")) {
                 try {
-                    tasks[taskCount] = new Todo(description);
-                    taskCount++;
-                    showTaskAdded(tasks[taskCount - 1], taskCount);
+                    String description = command.substring(4).trim();
+
+                    if (description.isEmpty()) {
+                        throw new ErmActuallyException("Please add a description for todo!");
+                    }
+
+                    Task toDoTask = new Todo(description);
+
+                    tasks.add(toDoTask);
+
+                    showTaskAdded(toDoTask, tasks.size());
                 } catch (ErmActuallyException e) {
                     showError(e.getMessage());
                 }
 
             } else if (command.equals("deadline") || command.startsWith("deadline ")) {
-                String[] parts = command.substring(8).split(" /by", -1);
+                try {
+                    String details = command.substring(8).trim();
 
-                if (parts.length < 2) {
-                    showError("Please add a deadline using /by.");
-                } else {
-                    try {
-                        tasks[taskCount] = new Deadline(parts[0], parts[1]);
-                        taskCount++;
-                        showTaskAdded(tasks[taskCount - 1], taskCount);
-                    } catch (ErmActuallyException e) {
-                        showError(e.getMessage());
-                    }
+                    String[] parts = details.split(" /by", 2);
+
+                    if (parts.length != 2) {
+                        throw new ErmActuallyException("Please /by for the deadline.");
                 }
 
-            } else if (command.equals("event") || command.startsWith("event ")) {
-                String[] fromParts = command.substring(5).split(" /from", -1);
+                    String description = parts[0].trim();
+                    String by = parts[1].trim();
 
-                if (fromParts.length < 2) {
-                    showError("Please add an event start time using /from.");
-                } else {
-                    String[] toParts = fromParts[1].split(" /to", -1);
-
-                    if (toParts.length < 2) {
-                        showError("Please add an event end time using /to.");
-                    } else {
-                        try {
-                            tasks[taskCount] = new Event(fromParts[0], toParts[0], toParts[1]);
-                            taskCount++;
-                            showTaskAdded(tasks[taskCount - 1], taskCount);
-                        } catch (ErmActuallyException e) {
-                            showError(e.getMessage());
-                        }
+                    if (description.isEmpty()) {
+                        throw new ErmActuallyException("Please add a description for deadline!");
                     }
+
+                    if (by.isEmpty()) {
+                        throw new ErmActuallyException("Please add a deadline using /by.");
+                    }
+
+                    Task deadlineTask = new Deadline(description, by);
+
+                    tasks.add(deadlineTask);
+
+                    showTaskAdded(deadlineTask, tasks.size());
+                } catch (ErmActuallyException e) {
+                    showError(e.getMessage());
                 }
-            } else {
-                System.out.println(line);
+            }
+
+            //event commmand
+            else if (command.equals("event") || command.startsWith("event ")) {
+
+                try {
+                    String details = command.substring(5).trim();
+
+                    String[] fromSplit = details.split("/from", 2);
+
+                    if (fromSplit.length != 2) {
+                        throw new ErmActuallyException("Please add a /from for the event!");
+                    }
+
+                    String description = fromSplit[0].trim();
+
+                    String[] toSplit = fromSplit[1].split("/to", 2);
+
+                    if (toSplit.length != 2) {
+                        throw new ErmActuallyException("Please add a /to for the event!");
+                    }
+
+                    String from = toSplit[0].trim();
+                    String to = toSplit[1].trim();
+
+                    if (description.isEmpty()) {
+                        throw new ErmActuallyException("Please add a description for this event!");
+                    }
+
+                    if (from.isEmpty() || to.isEmpty()) {
+                        throw new ErmActuallyException("Event time details cannot be empty.");
+                    }
+
+                    Task task = new Event(description, from, to);
+
+                    tasks.add(task);
+
+                    showTaskAdded(task, tasks.size());
+
+                } catch (ErmActuallyException e) {
+                    showError(e.getMessage());
+                }
+            }
+
+            //unknown commands
+            else {
                 showError("actually.. what are you saying??");
-                System.out.println(line);
-
             }
 
         }
