@@ -10,8 +10,6 @@ public class ErmActually {
      * @param args command-line arguments, which this application does not use
      */
     public static void main(String[] args) {
-
-
         String banner = "+----------------+\n"
                 + "|  Erm Actually  |\n"
                 + "+----------------+";
@@ -69,42 +67,54 @@ public class ErmActually {
                 System.out.println("  " + tasks[taskIndex]);
                 System.out.println(line);
 
-            } else if (command.startsWith("todo ")) {
-                String description = command.substring(5);
-                tasks[taskCount] = new Todo(description);
-                taskCount++;
-                showTaskAdded(tasks[taskCount -1], taskCount);
-
-            } else if (command.startsWith("deadline ")) {
-                String[] parts = command.substring(9).split(" /by ", 2);
-
-                if (parts.length < 2) {
-                    System.out.println("Please add a deadline using /by.");
-                } else {
-                    tasks[taskCount] = new Deadline(parts[0], parts[1]);
+            } else if (command.equals("todo") || command.startsWith("todo ")) {
+                String description = command.substring(4);
+                try {
+                    tasks[taskCount] = new Todo(description);
                     taskCount++;
-                    showTaskAdded(tasks[taskCount-1], taskCount);
+                    showTaskAdded(tasks[taskCount - 1], taskCount);
+                } catch (ErmActuallyException e) {
+                    showError(e.getMessage());
                 }
 
-            } else if (command.startsWith("event ")) {
-                String[] fromParts = command.substring(6).split(" /from ", 2);
+            } else if (command.equals("deadline") || command.startsWith("deadline ")) {
+                String[] parts = command.substring(8).split(" /by", -1);
+
+                if (parts.length < 2) {
+                    showError("Please add a deadline using /by.");
+                } else {
+                    try {
+                        tasks[taskCount] = new Deadline(parts[0], parts[1]);
+                        taskCount++;
+                        showTaskAdded(tasks[taskCount - 1], taskCount);
+                    } catch (ErmActuallyException e) {
+                        showError(e.getMessage());
+                    }
+                }
+
+            } else if (command.equals("event") || command.startsWith("event ")) {
+                String[] fromParts = command.substring(5).split(" /from", -1);
 
                 if (fromParts.length < 2) {
-                    System.out.println("Please add an event start time using /from.");
+                    showError("Please add an event start time using /from.");
                 } else {
-                    String[] toParts = fromParts[1].split(" /to ", 2);
+                    String[] toParts = fromParts[1].split(" /to", -1);
 
                     if (toParts.length < 2) {
-                        System.out.println("Please add an event end time using /to.");
+                        showError("Please add an event end time using /to.");
                     } else {
-                        tasks[taskCount] = new Event(fromParts[0], toParts[0], toParts[1]);
-                        taskCount++;
-                        showTaskAdded(tasks[taskCount-1], taskCount);
+                        try {
+                            tasks[taskCount] = new Event(fromParts[0], toParts[0], toParts[1]);
+                            taskCount++;
+                            showTaskAdded(tasks[taskCount - 1], taskCount);
+                        } catch (ErmActuallyException e) {
+                            showError(e.getMessage());
+                        }
                     }
                 }
             } else {
                 System.out.println(line);
-                System.out.println(" " + command);
+                showError("actually.. what are you saying??");
                 System.out.println(line);
 
             }
@@ -118,5 +128,12 @@ public class ErmActually {
         System.out.println("   " + task);
         System.out.println(" Wow! you have " + taskCount + " tasks in the list.");
         System.out.println("____________________________________________________________");
+    }
+
+    private static void showError(String message) {
+        String line = "____________________________________________________________";
+        System.out.println(line);
+        System.out.println(" uhohhhh... " + message);
+        System.out.println(line);
     }
 }

@@ -1,9 +1,30 @@
 public class Deadline extends Task {
     protected String by;
 
-    public Deadline(String description, String by) {
-        super(description);
-        this.by = by;
+    /**
+     * Creates a deadline with a description and deadline value.
+     *
+     * @param description task description
+     * @param by deadline value
+     * @throws ErmActuallyException if either required value is empty
+     */
+    public Deadline(String description, String by) throws ErmActuallyException {
+        super(validateDescription(description));
+        this.by = validateDeadline(by);
+    }
+
+    private static String validateDescription(String description) throws ErmActuallyException {
+        if (description == null || description.trim().isEmpty()) {
+            throw new ErmActuallyException("The description of a deadline cannot be empty.");
+        }
+        return description.trim();
+    }
+
+    private static String validateDeadline(String by) throws ErmActuallyException {
+        if (by == null || by.trim().isEmpty()) {
+            throw new ErmActuallyException("The deadline cannot be empty.");
+        }
+        return by.trim();
     }
 
     @Override
