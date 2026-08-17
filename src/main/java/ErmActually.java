@@ -39,10 +39,18 @@ public class ErmActually {
                 break;
             } else if (command.equals("list")) {
                 for (int i = 0; i < taskCount; i++) {
-                    System.out.println((i+1) + ". " + tasks[i]);
+                    System.out.println((i + 1) + ". " + tasks[i]);
                 }
+            } else if (command.startsWith("mark ")) {
+                int taskNumber = Integer.parseInt(command.substring(5));
+                int taskIndex = taskNumber - 1;
+
+                tasks[taskIndex] = "[X]" + tasks[taskIndex].substring(3);
+
+                System.out.println("You've actually finished this task:");
+                System.out.println(" " + tasks[taskIndex]);
             } else {
-                tasks[taskCount] = command;
+                tasks[taskCount] = "[ ] " + command;
                 taskCount++;
                 System.out.println("added: " + command);
             }
