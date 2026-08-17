@@ -27,7 +27,7 @@ public class ErmActually {
         System.out.println(line);
 
         Scanner scanner = new Scanner(System.in);
-        String[] tasks = new String[100];
+        Task[] tasks = new Task[100];
         int taskCount = 0;
         while (true) {
             String command = scanner.nextLine();
@@ -45,7 +45,7 @@ public class ErmActually {
                 int taskNumber = Integer.parseInt(command.substring(5));
                 int taskIndex = taskNumber - 1;
 
-                tasks[taskIndex] = "[X]" + tasks[taskIndex].substring(3);
+                tasks[taskIndex].markAsDone();
 
                 System.out.println("oh! good job you've actually finished this task:");
                 System.out.println(" " + tasks[taskIndex]);
@@ -53,12 +53,12 @@ public class ErmActually {
                 int taskNumber = Integer.parseInt(command.substring(7));
                 int taskIndex = taskNumber - 1;
 
-                tasks[taskIndex] = "[ ]" + tasks[taskIndex].substring(3);
+                tasks[taskIndex].unmarkAsDone();
 
                 System.out.println("oh? okay then I'll unmark it for you:");
                 System.out.println("  " + tasks[taskIndex]);
             } else {
-                tasks[taskCount] = "[ ] " + command;
+                tasks[taskCount] = new Task(command);
                 taskCount++;
                 System.out.println("added: " + command);
             }
