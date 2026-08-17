@@ -90,6 +90,27 @@ public class ErmActually {
 
             }
 
+            //delete command
+            else if (command.startsWith("delete ")) {
+                try {
+                    int taskNumber = Integer.parseInt(command.substring(7).trim());
+                    int index = taskNumber - 1;
+
+                    Task removedTask = tasks.remove(index);
+
+                    System.out.println(line);
+                    System.out.println(" Noted. I've removed this task:");
+                    System.out.println("   " + removedTask);
+                    System.out.println(" Now you have " + tasks.size() + " tasks in the list.");
+                    System.out.println(line);
+
+                } catch (NumberFormatException e) {
+                    showError("Please provide a valid task number.");
+                } catch (IndexOutOfBoundsException e) {
+                    showError("That task number does not exist.");
+                }
+            }
+
             //todo command
             else if (command.equals("todo") || command.startsWith("todo ")) {
                 try {
