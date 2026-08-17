@@ -47,8 +47,16 @@ public class ErmActually {
 
                 tasks[taskIndex] = "[X]" + tasks[taskIndex].substring(3);
 
-                System.out.println("You've actually finished this task:");
+                System.out.println("oh! good job you've actually finished this task:");
                 System.out.println(" " + tasks[taskIndex]);
+            } else if (command.startsWith("unmark ")) {
+                int taskNumber = Integer.parseInt(command.substring(7));
+                int taskIndex = taskNumber - 1;
+
+                tasks[taskIndex] = "[ ]" + tasks[taskIndex].substring(3);
+
+                System.out.println("oh? okay then I'll unmark it for you:");
+                System.out.println("  " + tasks[taskIndex]);
             } else {
                 tasks[taskCount] = "[ ] " + command;
                 taskCount++;
