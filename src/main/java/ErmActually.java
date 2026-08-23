@@ -1,10 +1,14 @@
 import java.util.Scanner;
 import java.util.ArrayList;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 /**
  * Starts ErmActually, which greets the user, echoes commands, and exits on {@code bye}.
  */
 public class ErmActually {
+    private static final Path SAVE_FILE = Path.of("data", "ErmActually.txt");
     /**
      * Runs the command loop until the user enters {@code bye}.
      *
@@ -67,6 +71,7 @@ public class ErmActually {
                     int taskIndex = taskNumber - 1;
 
                     tasks.get(taskIndex).markAsDone();
+                    saveTasks(tasks);
 
                     System.out.println(line);
                     System.out.println("oh! good job you've actually finished this task:");
@@ -87,6 +92,7 @@ public class ErmActually {
                     int taskIndex = taskNumber - 1;
 
                     tasks.get(taskIndex).unmarkAsDone();
+                    saveTasks(tasks);
 
                     System.out.println(line);
                     System.out.println("oh? okay then I'll unmark it for you:");
@@ -106,6 +112,7 @@ public class ErmActually {
                     int index = taskNumber - 1;
 
                     Task removedTask = tasks.remove(index);
+                    saveTasks(tasks);
 
                     System.out.println(line);
                     System.out.println(" Noted. I've removed this task:");
@@ -132,6 +139,7 @@ public class ErmActually {
                     Task toDoTask = new Todo(description);
 
                     tasks.add(toDoTask);
+                    saveTasks(tasks);
 
                     showTaskAdded(toDoTask, tasks.size());
                 } catch (ErmActuallyException e) {
@@ -162,6 +170,7 @@ public class ErmActually {
                     Task deadlineTask = new Deadline(description, by);
 
                     tasks.add(deadlineTask);
+                    saveTasks(tasks);
 
                     showTaskAdded(deadlineTask, tasks.size());
                 } catch (ErmActuallyException e) {
@@ -203,6 +212,7 @@ public class ErmActually {
                     Task task = new Event(description, from, to);
 
                     tasks.add(task);
+                    saveTasks(tasks);
 
                     showTaskAdded(task, tasks.size());
 
@@ -225,6 +235,44 @@ public class ErmActually {
         System.out.println("   " + task);
         System.out.println(" Wow! you have " + taskCount + " tasks in the list.");
         System.out.println("____________________________________________________________");
+    }
+
+    /**
+     * Saves the current tasks in a simple text format for a future startup loader.
+     *
+     * @param tasks tasks to save
+     */
+    private static void saveTasks(ArrayList<Task> tasks) {
+        ArrayList<String> savedTasks = new ArrayList<>();
+        for (Task task : tasks) {
+            savedTasks.add(formatTaskForSaving(task));
+        }
+
+        try {
+            Files.createDirectories(SAVE_FILE.getParent());
+            Files.write(SAVE_FILE, savedTasks);
+        } catch (IOException e) {
+            showError("I couldn't save your tasks.");
+        }
+    }
+
+    /**
+     * Converts a task to one line of the save-file format.
+     *
+     * @param task task to format
+     * @return a text line containing the task's type, completion status, and details
+     */
+    private static String formatTaskForSaving(Task task) {
+        String isDone = task.isDone() ? "1" : "0";
+        if (task instanceof Deadline) {
+            Deadline deadline = (Deadline) task;
+            return "D | " + isDone + " | " + deadline.description + " | " + deadline.by;
+        }
+        if (task instanceof Event) {
+            Event event = (Event) task;
+            return "E | " + isDone + " | " + event.description + " | " + event.from + " | " + event.to;
+        }
+        return "T | " + isDone + " | " + task.description;
     }
 
     private static void showError(String message) {
