@@ -5,6 +5,8 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Scanner;
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 
 /**
  * Starts ErmActually, loading saved tasks before greeting the user and processing commands.
@@ -61,6 +63,19 @@ public class ErmActually {
                 }
 
                 System.out.println(line);
+            } else if (command.equals("on") || command.startsWith("on ")) { //date search command
+                try {
+                    String dateText = command.substring(2).trim();
+                    if (dateText.isEmpty()) {
+                        throw new ErmActuallyException("Please provide a date in yyyy-MM-dd format.");
+                    }
+                    LocalDate requestedDate = LocalDate.parse(dateText);
+                    showTasksOnDate(tasks, requestedDate, line);
+                } catch (DateTimeParseException e) {
+                    showError("Please provide a valid date in yyyy-MM-dd format.");
+                } catch (ErmActuallyException e) {
+                    showError(e.getMessage());
+                }
             } else if (command.equals("mark") || command.startsWith("mark ")) { //mark command
                 try {
                     int taskIndex = parseTaskIndex(command, "mark");
@@ -220,6 +235,34 @@ public class ErmActually {
     }
 
     /**
+     * Displays deadlines and events that occur on a requested date, retaining their list numbers.
+     *
+     * @param tasks Complete task list to search.
+     * @param requestedDate Date on which tasks should occur.
+     * @param line Separator used by the console interface.
+     */
+    private static void showTasksOnDate(ArrayList<Task> tasks, LocalDate requestedDate, String line) {
+        System.out.println(line);
+        System.out.println(" Here are the tasks occurring on " + requestedDate + ":");
+        boolean hasMatch = false;
+        for (int i = 0; i < tasks.size(); i++) {
+            Task task = tasks.get(i);
+            boolean occursOnDate = task instanceof Deadline
+                    && ((Deadline) task).occursOn(requestedDate);
+            occursOnDate = occursOnDate || task instanceof Event
+                    && ((Event) task).occursOn(requestedDate);
+            if (occursOnDate) {
+                System.out.println(" " + (i + 1) + ". " + task);
+                hasMatch = true;
+            }
+        }
+        if (!hasMatch) {
+            System.out.println(" No deadlines or events found.");
+        }
+        System.out.println(line);
+    }
+
+    /**
      * Converts the task number after a command into a zero-based list index.
      *
      * @param command Complete user command.
@@ -374,11 +417,12 @@ public class ErmActually {
         String isDone = task.isDone() ? "1" : "0";
         if (task instanceof Deadline) {
             Deadline deadline = (Deadline) task;
-            return joinSavedFields("D", isDone, deadline.description, deadline.by);
+            return joinSavedFields("D", isDone, deadline.description, deadline.toStorageString());
         }
         if (task instanceof Event) {
             Event event = (Event) task;
-            return joinSavedFields("E", isDone, event.description, event.from, event.to);
+            return joinSavedFields("E", isDone, event.description,
+                    event.getFromStorageString(), event.getToStorageString());
         }
         return joinSavedFields("T", isDone, task.description);
     }
