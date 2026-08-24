@@ -5,7 +5,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 /**
- * Starts ErmActually, which greets the user, echoes commands, and exits on {@code bye}.
+ * Starts ErmActually, loading saved tasks before greeting the user and processing commands.
  */
 public class ErmActually {
     private static final Path SAVE_FILE = Path.of("data", "ErmActually.txt");
@@ -33,8 +33,7 @@ public class ErmActually {
 
         Scanner scanner = new Scanner(System.in);
 
-        //Stores Task objects in a dynamically sized list
-        ArrayList<Task> tasks = new ArrayList<>();
+        ArrayList<Task> tasks = loadTasks();
 
         while (true) {
             String command = scanner.nextLine().trim();
@@ -254,6 +253,51 @@ public class ErmActually {
         } catch (IOException e) {
             showError("I couldn't save your tasks.");
         }
+    }
+
+    /**
+     * Loads tasks saved by {@link #saveTasks(ArrayList)}. A missing save file means the task list starts empty.
+     *
+     * @return the saved tasks, or an empty list when no save file exists
+     */
+    private static ArrayList<Task> loadTasks() {
+        ArrayList<Task> tasks = new ArrayList<>();
+        if (!Files.exists(SAVE_FILE)) {
+            return tasks;
+        }
+
+        try {
+            for (String savedTask : Files.readAllLines(SAVE_FILE)) {
+                tasks.add(createTaskFromSavedLine(savedTask));
+            }
+        } catch (IOException | ErmActuallyException e) {
+            showError("I couldn't load your tasks.");
+        }
+        return tasks;
+    }
+
+    /**
+     * Recreates one task from the text format used in the save file.
+     *
+     * @param savedTask one line from the save file
+     * @return the recreated task with its saved completion status
+     * @throws ErmActuallyException if the saved task is not valid
+     */
+    private static Task createTaskFromSavedLine(String savedTask) throws ErmActuallyException {
+        String[] parts = savedTask.split(" \\| ", -1);
+        Task task;
+        if (parts[0].equals("T")) {
+            task = new Todo(parts[2]);
+        } else if (parts[0].equals("D")) {
+            task = new Deadline(parts[2], parts[3]);
+        } else {
+            task = new Event(parts[2], parts[3], parts[4]);
+        }
+
+        if (parts[1].equals("1")) {
+            task.markAsDone();
+        }
+        return task;
     }
 
     /**
