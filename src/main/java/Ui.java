@@ -40,7 +40,7 @@ public class Ui {
     }
 
     /** Displays every task with its one-based list number. */
-    public void showTaskList(ArrayList<Task> tasks) {
+    public void showTaskList(TaskList tasks) {
         System.out.println(LINE);
         System.out.println(" Here are the tasks in your list:");
         if (tasks.isEmpty()) {
@@ -54,22 +54,14 @@ public class Ui {
     }
 
     /** Displays deadlines and events occurring on a requested date. */
-    public void showTasksOnDate(ArrayList<Task> tasks, LocalDate requestedDate) {
+    public void showTasksOnDate(TaskList tasks, LocalDate requestedDate) {
         System.out.println(LINE);
         System.out.println(" Here are the tasks occurring on " + requestedDate + ":");
-        boolean hasMatch = false;
-        for (int i = 0; i < tasks.size(); i++) {
-            Task task = tasks.get(i);
-            boolean occursOnDate = task instanceof Deadline
-                    && ((Deadline) task).occursOn(requestedDate);
-            occursOnDate = occursOnDate || task instanceof Event
-                    && ((Event) task).occursOn(requestedDate);
-            if (occursOnDate) {
-                System.out.println(" " + (i + 1) + ". " + task);
-                hasMatch = true;
-            }
+        ArrayList<Integer> matchingIndexes = tasks.findIndexesOn(requestedDate);
+        for (int index : matchingIndexes) {
+            System.out.println(" " + (index + 1) + ". " + tasks.get(index));
         }
-        if (!hasMatch) {
+        if (matchingIndexes.isEmpty()) {
             System.out.println(" No deadlines or events found.");
         }
         System.out.println(LINE);

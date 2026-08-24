@@ -1,5 +1,4 @@
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 
@@ -16,12 +15,12 @@ public class ErmActually {
         Ui ui = new Ui();
         Storage storage = new Storage(Path.of("data", "ErmActually.txt"));
         ui.showWelcome();
-        ArrayList<Task> tasks;
+        TaskList tasks;
         try {
-            tasks = storage.load();
+            tasks = new TaskList(storage.load());
         } catch (ErmActuallyException e) {
             ui.showError(e.getMessage());
-            tasks = new ArrayList<>();
+            tasks = new TaskList();
         }
 
         while (ui.hasNextCommand()) {
@@ -49,7 +48,7 @@ public class ErmActually {
                 try {
                     int taskIndex = parseTaskIndex(command, "mark");
 
-                    tasks.get(taskIndex).markAsDone();
+                    tasks.mark(taskIndex);
                     saveTasks(storage, tasks, ui);
                     ui.showTaskMarked(tasks.get(taskIndex));
                 } catch (ErmActuallyException e) {
@@ -61,7 +60,7 @@ public class ErmActually {
                 try {
                     int taskIndex = parseTaskIndex(command, "unmark");
 
-                    tasks.get(taskIndex).unmarkAsDone();
+                    tasks.unmark(taskIndex);
                     saveTasks(storage, tasks, ui);
                     ui.showTaskUnmarked(tasks.get(taskIndex));
                 } catch (ErmActuallyException e) {
@@ -73,7 +72,7 @@ public class ErmActually {
                 try {
                     int index = parseTaskIndex(command, "delete");
 
-                    Task removedTask = tasks.remove(index);
+                    Task removedTask = tasks.delete(index);
                     saveTasks(storage, tasks, ui);
                     ui.showTaskDeleted(removedTask, tasks.size());
 
@@ -203,7 +202,7 @@ public class ErmActually {
      * @param tasks Current tasks.
      * @param ui Console interface used to report a failure.
      */
-    private static void saveTasks(Storage storage, ArrayList<Task> tasks, Ui ui) {
+    private static void saveTasks(Storage storage, TaskList tasks, Ui ui) {
         try {
             storage.save(tasks);
         } catch (ErmActuallyException e) {

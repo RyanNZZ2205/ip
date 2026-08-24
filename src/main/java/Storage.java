@@ -51,7 +51,7 @@ public class Storage {
      * @param tasks Tasks to save.
      * @throws ErmActuallyException If the data file cannot be written.
      */
-    public void save(ArrayList<Task> tasks) throws ErmActuallyException {
+    public void save(TaskList tasks) throws ErmActuallyException {
         ArrayList<String> savedTasks = new ArrayList<>();
         for (Task task : tasks) {
             savedTasks.add(formatTaskForSaving(task));
