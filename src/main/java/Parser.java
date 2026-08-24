@@ -81,7 +81,7 @@ public class Parser {
         String details = command.substring("deadline".length()).trim();
         String[] parts = details.split(" /by", 2);
         if (parts.length != 2) {
-            throw new ErmActuallyException("Please /by for the deadline.");
+            throw new ErmActuallyException("Please add a /by for the deadline.");
         }
 
         String description = parts[0].trim();
@@ -106,7 +106,7 @@ public class Parser {
         String description = fromSplit[0].trim();
         String[] toSplit = fromSplit[1].split("/to", 2);
         if (toSplit.length != 2) {
-            throw new ErmActuallyException("Please add a /to for the event!");
+            throw new ErmActuallyException("Please add a /to and /from for the event!");
         }
 
         String from = toSplit[0].trim();
@@ -115,7 +115,7 @@ public class Parser {
             throw new ErmActuallyException("Please add a description for this event!");
         }
         if (from.isEmpty() || to.isEmpty()) {
-            throw new ErmActuallyException("Event time details cannot be empty.");
+            throw new ErmActuallyException("Event /to and /from details cannot be empty! Please add them in.");
         }
         return new Event(description, from, to);
     }
