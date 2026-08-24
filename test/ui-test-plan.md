@@ -371,6 +371,7 @@ todo
 deadline  /by Friday
 deadline submit report /by
 event  /from Mon /to Tue
+event meeting /from Mon
 event meeting /from /to 4pm
 event meeting /from 2pm /to
 bye
@@ -378,7 +379,7 @@ bye
 
 **Command:**
 ```powershell
-if (Test-Path data) { Remove-Item -Recurse -Force data }; javac -d _temp\ui-test-classes src\main\java\*.java; @("todo", "deadline  /by Friday", "deadline submit report /by", "event  /from Mon /to Tue", "event meeting /from /to 4pm", "event meeting /from 2pm /to", "bye") | java -cp _temp\ui-test-classes ErmActually
+if (Test-Path data) { Remove-Item -Recurse -Force data }; javac -d _temp\ui-test-classes src\main\java\*.java; @("todo", "deadline  /by Friday", "deadline submit report /by", "event  /from Mon /to Tue", "event meeting /from Mon", "event meeting /from /to 4pm", "event meeting /from 2pm /to", "bye") | java -cp _temp\ui-test-classes ErmActually
 ```
 
 **Expected output:**
@@ -394,7 +395,7 @@ ____________________________________________________________
  uhohhhh... Please add a description for todo!
 ____________________________________________________________
 ____________________________________________________________
- uhohhhh... Please /by for the deadline.
+ uhohhhh... Please add a /by for the deadline.
 ____________________________________________________________
 ____________________________________________________________
  uhohhhh... Please add a deadline using /by.
@@ -403,10 +404,13 @@ ____________________________________________________________
  uhohhhh... Please add a description for this event!
 ____________________________________________________________
 ____________________________________________________________
- uhohhhh... Event time details cannot be empty.
+ uhohhhh... Please add a /to and /from for the event!
 ____________________________________________________________
 ____________________________________________________________
- uhohhhh... Event time details cannot be empty.
+ uhohhhh... Event /to and /from details cannot be empty! Please add them in.
+____________________________________________________________
+____________________________________________________________
+ uhohhhh... Event /to and /from details cannot be empty! Please add them in.
 ____________________________________________________________
 ____________________________________________________________
 Farewell! Hope you stop by again soon!
