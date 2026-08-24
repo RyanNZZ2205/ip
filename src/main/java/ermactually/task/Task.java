@@ -1,3 +1,5 @@
+package ermactually.task;
+
 /**
  * Represents a task the user can complete or leave unfinished.
  */
@@ -44,6 +46,15 @@ public class Task {
      */
     public boolean isDone() {
         return isDone;
+    }
+
+    /**
+     * Returns the task description.
+     *
+     * @return Task description.
+     */
+    public String getDescription() {
+        return description;
     }
 
     /**

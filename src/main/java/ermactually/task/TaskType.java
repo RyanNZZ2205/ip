@@ -1,3 +1,5 @@
+package ermactually.task;
+
 /**
  * Lists the supported task types and their display symbols.
  */

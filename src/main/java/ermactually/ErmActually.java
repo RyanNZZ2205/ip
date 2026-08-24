@@ -1,4 +1,9 @@
+package ermactually;
+
 import java.nio.file.Path;
+
+import ermactually.task.Task;
+import ermactually.task.TaskList;
 
 /**
  * Coordinates the user interface, task storage, task list, and command processing.

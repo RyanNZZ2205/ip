@@ -1,9 +1,17 @@
+package ermactually;
+
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Base64;
+
+import ermactually.task.Deadline;
+import ermactually.task.Event;
+import ermactually.task.Task;
+import ermactually.task.TaskList;
+import ermactually.task.Todo;
 
 /**
  * Loads tasks from disk and saves the current task list to disk.
@@ -131,14 +139,14 @@ public class Storage {
         String isDone = task.isDone() ? "1" : "0";
         if (task instanceof Deadline) {
             Deadline deadline = (Deadline) task;
-            return joinSavedFields("D", isDone, deadline.description, deadline.toStorageString());
+            return joinSavedFields("D", isDone, deadline.getDescription(), deadline.toStorageString());
         }
         if (task instanceof Event) {
             Event event = (Event) task;
-            return joinSavedFields("E", isDone, event.description,
+            return joinSavedFields("E", isDone, event.getDescription(),
                     event.getFromStorageString(), event.getToStorageString());
         }
-        return joinSavedFields("T", isDone, task.description);
+        return joinSavedFields("T", isDone, task.getDescription());
     }
 
     /** Encodes task details and joins all fields into one save-file line. */

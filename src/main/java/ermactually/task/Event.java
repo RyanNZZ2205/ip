@@ -1,8 +1,12 @@
+package ermactually.task;
+
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.Locale;
+
+import ermactually.ErmActuallyException;
 
 /**
  * Represents a task that occurs over a specified period.

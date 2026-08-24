@@ -25,7 +25,7 @@ bye
 
 **Command:**
 ```powershell
-if (Test-Path data) { Remove-Item -Recurse -Force data }; javac -d _temp\ui-test-classes src\main\java\*.java; @("todo borrow book", "list", "bye") | java -cp _temp\ui-test-classes ErmActually; Get-Content data\ErmActually.txt
+if (Test-Path data) { Remove-Item -Recurse -Force data }; javac -d _temp\ui-test-classes (Get-ChildItem src\main\java -Recurse -Filter *.java).FullName; @("todo borrow book", "list", "bye") | java -cp _temp\ui-test-classes ermactually.ErmActually; Get-Content data\ErmActually.txt
 ```
 
 **Expected output:**
@@ -64,7 +64,7 @@ bye
 
 **Command:**
 ```powershell
-if (Test-Path data) { Remove-Item -Recurse -Force data }; javac -d _temp\ui-test-classes src\main\java\*.java; @("deadline return book /by 2019-12-02", "bye") | java -cp _temp\ui-test-classes ErmActually; Get-Content data\ErmActually.txt
+if (Test-Path data) { Remove-Item -Recurse -Force data }; javac -d _temp\ui-test-classes (Get-ChildItem src\main\java -Recurse -Filter *.java).FullName; @("deadline return book /by 2019-12-02", "bye") | java -cp _temp\ui-test-classes ermactually.ErmActually; Get-Content data\ErmActually.txt
 ```
 
 **Expected output:**
@@ -99,7 +99,7 @@ bye
 
 **Command:**
 ```powershell
-if (Test-Path data) { Remove-Item -Recurse -Force data }; javac -d _temp\ui-test-classes src\main\java\*.java; @("deadline submit report /by 2026-08-25 1900", "bye") | java -cp _temp\ui-test-classes ErmActually; Get-Content data\ErmActually.txt
+if (Test-Path data) { Remove-Item -Recurse -Force data }; javac -d _temp\ui-test-classes (Get-ChildItem src\main\java -Recurse -Filter *.java).FullName; @("deadline submit report /by 2026-08-25 1900", "bye") | java -cp _temp\ui-test-classes ermactually.ErmActually; Get-Content data\ErmActually.txt
 ```
 
 **Expected output:**
@@ -134,7 +134,7 @@ bye
 
 **Command:**
 ```powershell
-if (Test-Path data) { Remove-Item -Recurse -Force data }; javac -d _temp\ui-test-classes src\main\java\*.java; @("deadline return book /by 2/12/2019", "bye") | java -cp _temp\ui-test-classes ErmActually
+if (Test-Path data) { Remove-Item -Recurse -Force data }; javac -d _temp\ui-test-classes (Get-ChildItem src\main\java -Recurse -Filter *.java).FullName; @("deadline return book /by 2/12/2019", "bye") | java -cp _temp\ui-test-classes ermactually.ErmActually
 ```
 
 **Expected output:**
@@ -166,7 +166,7 @@ bye
 
 **Command:**
 ```powershell
-if (Test-Path data) { Remove-Item -Recurse -Force data }; javac -d _temp\ui-test-classes src\main\java\*.java; @("event project meeting /from 2019-12-02 1400 /to 2019-12-02 1600", "bye") | java -cp _temp\ui-test-classes ErmActually
+if (Test-Path data) { Remove-Item -Recurse -Force data }; javac -d _temp\ui-test-classes (Get-ChildItem src\main\java -Recurse -Filter *.java).FullName; @("event project meeting /from 2019-12-02 1400 /to 2019-12-02 1600", "bye") | java -cp _temp\ui-test-classes ermactually.ErmActually
 ```
 
 **Expected output:**
@@ -200,7 +200,7 @@ bye
 
 **Command:**
 ```powershell
-if (Test-Path data) { Remove-Item -Recurse -Force data }; javac -d _temp\ui-test-classes src\main\java\*.java; @("event holiday /from 2026-08-25 /to 2026-08-25", "bye") | java -cp _temp\ui-test-classes ErmActually; Get-Content data\ErmActually.txt
+if (Test-Path data) { Remove-Item -Recurse -Force data }; javac -d _temp\ui-test-classes (Get-ChildItem src\main\java -Recurse -Filter *.java).FullName; @("event holiday /from 2026-08-25 /to 2026-08-25", "bye") | java -cp _temp\ui-test-classes ermactually.ErmActually; Get-Content data\ErmActually.txt
 ```
 
 **Expected output:**
@@ -238,7 +238,7 @@ bye
 
 **Command:**
 ```powershell
-if (Test-Path data) { Remove-Item -Recurse -Force data }; javac -d _temp\ui-test-classes src\main\java\*.java; @("todo borrow book", "deadline submit report /by 2019-12-03", "event conference /from 2019-12-02 0900 /to 2019-12-04 1700", "on 2019-12-03", "bye") | java -cp _temp\ui-test-classes ErmActually
+if (Test-Path data) { Remove-Item -Recurse -Force data }; javac -d _temp\ui-test-classes (Get-ChildItem src\main\java -Recurse -Filter *.java).FullName; @("todo borrow book", "deadline submit report /by 2019-12-03", "event conference /from 2019-12-02 0900 /to 2019-12-04 1700", "on 2019-12-03", "bye") | java -cp _temp\ui-test-classes ermactually.ErmActually
 ```
 
 **Expected output:**
@@ -289,7 +289,7 @@ bye
 
 **Command:**
 ```powershell
-if (Test-Path data) { Remove-Item -Recurse -Force data }; javac -d _temp\ui-test-classes src\main\java\*.java; @("on 2019-12-03", "on", "on Tuesday", "bye") | java -cp _temp\ui-test-classes ErmActually
+if (Test-Path data) { Remove-Item -Recurse -Force data }; javac -d _temp\ui-test-classes (Get-ChildItem src\main\java -Recurse -Filter *.java).FullName; @("on 2019-12-03", "on", "on Tuesday", "bye") | java -cp _temp\ui-test-classes ermactually.ErmActually
 ```
 
 **Expected output:**
@@ -330,7 +330,7 @@ bye
 
 **Command:**
 ```powershell
-if (Test-Path data) { Remove-Item -Recurse -Force data }; javac -d _temp\ui-test-classes src\main\java\*.java; @("todo borrow book", "mark 1", "unmark 1", "bye") | java -cp _temp\ui-test-classes ErmActually; Get-Content data\ErmActually.txt
+if (Test-Path data) { Remove-Item -Recurse -Force data }; javac -d _temp\ui-test-classes (Get-ChildItem src\main\java -Recurse -Filter *.java).FullName; @("todo borrow book", "mark 1", "unmark 1", "bye") | java -cp _temp\ui-test-classes ermactually.ErmActually; Get-Content data\ErmActually.txt
 ```
 
 **Expected output:**
@@ -379,7 +379,7 @@ bye
 
 **Command:**
 ```powershell
-if (Test-Path data) { Remove-Item -Recurse -Force data }; javac -d _temp\ui-test-classes src\main\java\*.java; @("todo", "deadline  /by Friday", "deadline submit report /by", "event  /from Mon /to Tue", "event meeting /from Mon", "event meeting /from /to 4pm", "event meeting /from 2pm /to", "bye") | java -cp _temp\ui-test-classes ErmActually
+if (Test-Path data) { Remove-Item -Recurse -Force data }; javac -d _temp\ui-test-classes (Get-ChildItem src\main\java -Recurse -Filter *.java).FullName; @("todo", "deadline  /by Friday", "deadline submit report /by", "event  /from Mon /to Tue", "event meeting /from Mon", "event meeting /from /to 4pm", "event meeting /from 2pm /to", "bye") | java -cp _temp\ui-test-classes ermactually.ErmActually
 ```
 
 **Expected output:**
@@ -429,7 +429,7 @@ bye
 
 **Command:**
 ```powershell
-New-Item -ItemType Directory -Force data | Out-Null; @("T | 1 | borrow book", "D | 0 | return book | 2019-12-02", "E | 0 | project meeting | 2019-12-02T14:00 | 2019-12-02T16:00") | Set-Content data\ErmActually.txt; javac -d _temp\ui-test-classes src\main\java\*.java; @("list", "bye") | java -cp _temp\ui-test-classes ErmActually
+New-Item -ItemType Directory -Force data | Out-Null; @("T | 1 | borrow book", "D | 0 | return book | 2019-12-02", "E | 0 | project meeting | 2019-12-02T14:00 | 2019-12-02T16:00") | Set-Content data\ErmActually.txt; javac -d _temp\ui-test-classes (Get-ChildItem src\main\java -Recurse -Filter *.java).FullName; @("list", "bye") | java -cp _temp\ui-test-classes ermactually.ErmActually
 ```
 
 **Expected output:**
@@ -464,7 +464,7 @@ bye
 
 **Command:**
 ```powershell
-if (Test-Path data) { Remove-Item -Recurse -Force data }; javac -d _temp\ui-test-classes src\main\java\*.java; @("todo read | review", "bye") | java -cp _temp\ui-test-classes ErmActually; Get-Content data\ErmActually.txt
+if (Test-Path data) { Remove-Item -Recurse -Force data }; javac -d _temp\ui-test-classes (Get-ChildItem src\main\java -Recurse -Filter *.java).FullName; @("todo read | review", "bye") | java -cp _temp\ui-test-classes ermactually.ErmActually; Get-Content data\ErmActually.txt
 ```
 
 **Expected output:**
@@ -499,7 +499,7 @@ bye
 
 **Command:**
 ```powershell
-if (Test-Path data) { Remove-Item -Recurse -Force data }; New-Item -ItemType Directory -Force data | Out-Null; "X | 4 | invalid" | Set-Content data\ErmActually.txt; javac -d _temp\ui-test-classes src\main\java\*.java; @("list", "bye") | java -cp _temp\ui-test-classes ErmActually
+if (Test-Path data) { Remove-Item -Recurse -Force data }; New-Item -ItemType Directory -Force data | Out-Null; "X | 4 | invalid" | Set-Content data\ErmActually.txt; javac -d _temp\ui-test-classes (Get-ChildItem src\main\java -Recurse -Filter *.java).FullName; @("list", "bye") | java -cp _temp\ui-test-classes ermactually.ErmActually
 ```
 
 **Expected output:**
@@ -536,7 +536,7 @@ delete
 
 **Command:**
 ```powershell
-if (Test-Path data) { Remove-Item -Recurse -Force data }; javac -d _temp\ui-test-classes src\main\java\*.java; @("mark", "unmark", "delete") | java -cp _temp\ui-test-classes ErmActually
+if (Test-Path data) { Remove-Item -Recurse -Force data }; javac -d _temp\ui-test-classes (Get-ChildItem src\main\java -Recurse -Filter *.java).FullName; @("mark", "unmark", "delete") | java -cp _temp\ui-test-classes ermactually.ErmActually
 ```
 
 **Expected output:**

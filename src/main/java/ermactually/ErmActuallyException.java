@@ -1,3 +1,5 @@
+package ermactually;
+
 /**
  * Represents an error caused by invalid input to the Erm Actually chatbot.
  */
