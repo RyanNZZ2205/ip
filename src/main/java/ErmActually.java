@@ -3,12 +3,16 @@ import java.util.ArrayList;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 
 /**
  * Starts ErmActually, loading saved tasks before greeting the user and processing commands.
  */
 public class ErmActually {
     private static final Path SAVE_FILE = Path.of("data", "ErmActually.txt");
+    private static final String SAVE_FORMAT_VERSION = "V2";
+    private static final String FIELD_SEPARATOR = " | ";
     /**
      * Runs the command loop until the user enters {@code bye}.
      *
@@ -35,7 +39,7 @@ public class ErmActually {
 
         ArrayList<Task> tasks = loadTasks();
 
-        while (true) {
+        while (scanner.hasNextLine()) {
             String command = scanner.nextLine().trim();
 
             //Bye Command
@@ -64,10 +68,9 @@ public class ErmActually {
             }
 
             //mark command
-            else if (command.startsWith("mark ")) {
+            else if (command.equals("mark") || command.startsWith("mark ")) {
                 try {
-                    int taskNumber = Integer.parseInt(command.substring(5));
-                    int taskIndex = taskNumber - 1;
+                    int taskIndex = parseTaskIndex(command, "mark");
 
                     tasks.get(taskIndex).markAsDone();
                     saveTasks(tasks);
@@ -76,8 +79,8 @@ public class ErmActually {
                     System.out.println("oh! good job you've actually finished this task:");
                     System.out.println(" " + tasks.get(taskIndex));
                     System.out.println(line);
-                } catch (NumberFormatException e) {
-                    showError("Please provide a valid task number.");
+                } catch (ErmActuallyException e) {
+                    showError(e.getMessage());
                 } catch (IndexOutOfBoundsException e) {
                     showError("That task number does not exist.");
                 }
@@ -85,10 +88,9 @@ public class ErmActually {
 
 
             //unmark command
-            else if (command.startsWith("unmark ")) {
+            else if (command.equals("unmark") || command.startsWith("unmark ")) {
                 try {
-                    int taskNumber = Integer.parseInt(command.substring(7));
-                    int taskIndex = taskNumber - 1;
+                    int taskIndex = parseTaskIndex(command, "unmark");
 
                     tasks.get(taskIndex).unmarkAsDone();
                     saveTasks(tasks);
@@ -97,18 +99,17 @@ public class ErmActually {
                     System.out.println("oh? okay then I'll unmark it for you:");
                     System.out.println("  " + tasks.get(taskIndex));
                     System.out.println(line);
-                } catch (NumberFormatException e) {
-                    showError("Please provide a valid task number.");
+                } catch (ErmActuallyException e) {
+                    showError(e.getMessage());
                 } catch (IndexOutOfBoundsException e) {
                     showError("That task number does not exist.");
                 }
             }
 
             //delete command
-            else if (command.startsWith("delete ")) {
+            else if (command.equals("delete") || command.startsWith("delete ")) {
                 try {
-                    int taskNumber = Integer.parseInt(command.substring(7).trim());
-                    int index = taskNumber - 1;
+                    int index = parseTaskIndex(command, "delete");
 
                     Task removedTask = tasks.remove(index);
                     saveTasks(tasks);
@@ -119,8 +120,8 @@ public class ErmActually {
                     System.out.println(" Now you have " + tasks.size() + " tasks in the list.");
                     System.out.println(line);
 
-                } catch (NumberFormatException e) {
-                    showError("Please provide a valid task number.");
+                } catch (ErmActuallyException e) {
+                    showError(e.getMessage());
                 } catch (IndexOutOfBoundsException e) {
                     showError("That task number does not exist.");
                 }
@@ -237,7 +238,27 @@ public class ErmActually {
     }
 
     /**
-     * Saves the current tasks in a simple text format for a future startup loader.
+     * Converts the task number after a command into a zero-based list index.
+     *
+     * @param command complete user command
+     * @param commandName command keyword at the beginning of the command
+     * @return the zero-based task index
+     * @throws ErmActuallyException if the supplied task number is missing, invalid, or less than one
+     */
+    private static int parseTaskIndex(String command, String commandName) throws ErmActuallyException {
+        try {
+            int taskNumber = Integer.parseInt(command.substring(commandName.length()).trim());
+            if (taskNumber < 1) {
+                throw new ErmActuallyException("Please provide a valid task number.");
+            }
+            return taskNumber - 1;
+        } catch (NumberFormatException e) {
+            throw new ErmActuallyException("Please provide a valid task number.");
+        }
+    }
+
+    /**
+     * Saves the current tasks in a versioned text format that safely preserves special characters.
      *
      * @param tasks tasks to save
      */
@@ -250,7 +271,7 @@ public class ErmActually {
         try {
             Files.createDirectories(SAVE_FILE.getParent());
             Files.write(SAVE_FILE, savedTasks);
-        } catch (IOException e) {
+        } catch (IOException | SecurityException e) {
             showError("I couldn't save your tasks.");
         }
     }
@@ -261,19 +282,20 @@ public class ErmActually {
      * @return the saved tasks, or an empty list when no save file exists
      */
     private static ArrayList<Task> loadTasks() {
-        ArrayList<Task> tasks = new ArrayList<>();
-        if (!Files.exists(SAVE_FILE)) {
-            return tasks;
-        }
-
         try {
+            if (!Files.exists(SAVE_FILE)) {
+                return new ArrayList<>();
+            }
+
+            ArrayList<Task> tasks = new ArrayList<>();
             for (String savedTask : Files.readAllLines(SAVE_FILE)) {
                 tasks.add(createTaskFromSavedLine(savedTask));
             }
-        } catch (IOException | ErmActuallyException e) {
+            return tasks;
+        } catch (IOException | SecurityException | ErmActuallyException e) {
             showError("I couldn't load your tasks.");
+            return new ArrayList<>();
         }
-        return tasks;
     }
 
     /**
@@ -285,16 +307,75 @@ public class ErmActually {
      */
     private static Task createTaskFromSavedLine(String savedTask) throws ErmActuallyException {
         String[] parts = savedTask.split(" \\| ", -1);
+        if (parts.length > 0 && parts[0].equals(SAVE_FORMAT_VERSION)) {
+            return createVersionTwoTask(parts);
+        }
+        return createLegacyTask(parts);
+    }
+
+    /**
+     * Recreates a task written by the current version of the application.
+     *
+     * @param parts fields in a version-two saved task
+     * @return the recreated task
+     * @throws ErmActuallyException if the saved task is invalid
+     */
+    private static Task createVersionTwoTask(String[] parts) throws ErmActuallyException {
+        if (parts.length < 4) {
+            throw new ErmActuallyException("Invalid saved task.");
+        }
+        String[] details = new String[parts.length - 3];
+        try {
+            for (int i = 3; i < parts.length; i++) {
+                details[i - 3] = new String(Base64.getDecoder().decode(parts[i]), StandardCharsets.UTF_8);
+            }
+        } catch (IllegalArgumentException e) {
+            throw new ErmActuallyException("Invalid saved task.");
+        }
+        return createTask(parts[1], parts[2], details);
+    }
+
+    /**
+     * Recreates a task written by the earlier plain-text save format.
+     *
+     * @param parts fields in a legacy saved task
+     * @return the recreated task
+     * @throws ErmActuallyException if the saved task is invalid
+     */
+    private static Task createLegacyTask(String[] parts) throws ErmActuallyException {
+        if (parts.length < 3) {
+            throw new ErmActuallyException("Invalid saved task.");
+        }
+        String[] details = new String[parts.length - 2];
+        System.arraycopy(parts, 2, details, 0, details.length);
+        return createTask(parts[0], parts[1], details);
+    }
+
+    /**
+     * Creates a task after validating its saved type, status, and required details.
+     *
+     * @param type saved task type
+     * @param status saved completion status
+     * @param details saved task details
+     * @return the recreated task
+     * @throws ErmActuallyException if the saved task is invalid
+     */
+    private static Task createTask(String type, String status, String[] details) throws ErmActuallyException {
+        if (!status.equals("0") && !status.equals("1")) {
+            throw new ErmActuallyException("Invalid saved task.");
+        }
         Task task;
-        if (parts[0].equals("T")) {
-            task = new Todo(parts[2]);
-        } else if (parts[0].equals("D")) {
-            task = new Deadline(parts[2], parts[3]);
+        if (type.equals("T") && details.length == 1) {
+            task = new Todo(details[0]);
+        } else if (type.equals("D") && details.length == 2) {
+            task = new Deadline(details[0], details[1]);
+        } else if (type.equals("E") && details.length == 3) {
+            task = new Event(details[0], details[1], details[2]);
         } else {
-            task = new Event(parts[2], parts[3], parts[4]);
+            throw new ErmActuallyException("Invalid saved task.");
         }
 
-        if (parts[1].equals("1")) {
+        if (status.equals("1")) {
             task.markAsDone();
         }
         return task;
@@ -310,13 +391,32 @@ public class ErmActually {
         String isDone = task.isDone() ? "1" : "0";
         if (task instanceof Deadline) {
             Deadline deadline = (Deadline) task;
-            return "D | " + isDone + " | " + deadline.description + " | " + deadline.by;
+            return joinSavedFields("D", isDone, deadline.description, deadline.by);
         }
         if (task instanceof Event) {
             Event event = (Event) task;
-            return "E | " + isDone + " | " + event.description + " | " + event.from + " | " + event.to;
+            return joinSavedFields("E", isDone, event.description, event.from, event.to);
         }
-        return "T | " + isDone + " | " + task.description;
+        return joinSavedFields("T", isDone, task.description);
+    }
+
+    /**
+     * Encodes task details before joining them into one versioned save-file line.
+     *
+     * @param type task type
+     * @param status completion status
+     * @param details task details to encode
+     * @return a safely formatted save-file line
+     */
+    private static String joinSavedFields(String type, String status, String... details) {
+        ArrayList<String> fields = new ArrayList<>();
+        fields.add(SAVE_FORMAT_VERSION);
+        fields.add(type);
+        fields.add(status);
+        for (String detail : details) {
+            fields.add(Base64.getEncoder().encodeToString(detail.getBytes(StandardCharsets.UTF_8)));
+        }
+        return String.join(FIELD_SEPARATOR, fields);
     }
 
     private static void showError(String message) {

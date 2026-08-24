@@ -49,7 +49,7 @@ ____________________________________________________________
 ____________________________________________________________
 Farewell! Hope you stop by again soon!
 ____________________________________________________________
-T | 0 | borrow book
+V2 | T | 0 | Ym9ycm93IGJvb2s=
 ```
 
 ## Test case: add deadline
@@ -162,7 +162,7 @@ ____________________________________________________________
 ____________________________________________________________
 Farewell! Hope you stop by again soon!
 ____________________________________________________________
-T | 0 | borrow book
+V2 | T | 0 | Ym9ycm93IGJvb2s=
 ```
 
 ## Test case: reject empty task fields
@@ -219,7 +219,7 @@ ____________________________________________________________
 
 ## Test case: load saved tasks
 
-**Aim:** Verify that todo, deadline, and event tasks, including completion state, are restored when the chatbot starts.
+**Aim:** Verify that legacy todo, deadline, and event tasks, including completion state, are restored when the chatbot starts.
 
 **Inputs:**
 ```text
@@ -249,5 +249,112 @@ ____________________________________________________________
 ____________________________________________________________
 ____________________________________________________________
 Farewell! Hope you stop by again soon!
+____________________________________________________________
+```
+
+## Test case: save special characters
+
+**Aim:** Verify that a description containing the save-file delimiter is preserved safely.
+
+**Inputs:**
+```text
+todo read | review
+bye
+```
+
+**Command:**
+```powershell
+if (Test-Path data) { Remove-Item -Recurse -Force data }; javac -d _temp\ui-test-classes src\main\java\*.java; @("todo read | review", "bye") | java -cp _temp\ui-test-classes ErmActually; Get-Content data\ErmActually.txt
+```
+
+**Expected output:**
+```text
+____________________________________________________________
++----------------+
+|  Erm Actually  |
++----------------+
+Greetings! I'm Erm Actually.
+What can I actually do for you?
+____________________________________________________________
+____________________________________________________________
+ Alright! I've added this new task:
+   [T][ ] read | review
+ Wow! you have 1 tasks in the list.
+____________________________________________________________
+____________________________________________________________
+Farewell! Hope you stop by again soon!
+____________________________________________________________
+V2 | T | 0 | cmVhZCB8IHJldmlldw==
+```
+
+## Test case: reject invalid saved tasks
+
+**Aim:** Verify that malformed saved data shows an error and does not partially load tasks.
+
+**Inputs:**
+```text
+list
+bye
+```
+
+**Command:**
+```powershell
+if (Test-Path data) { Remove-Item -Recurse -Force data }; New-Item -ItemType Directory -Force data | Out-Null; "X | 4 | invalid" | Set-Content data\ErmActually.txt; javac -d _temp\ui-test-classes src\main\java\*.java; @("list", "bye") | java -cp _temp\ui-test-classes ErmActually
+```
+
+**Expected output:**
+```text
+____________________________________________________________
++----------------+
+|  Erm Actually  |
++----------------+
+Greetings! I'm Erm Actually.
+What can I actually do for you?
+____________________________________________________________
+____________________________________________________________
+ uhohhhh... I couldn't load your tasks.
+____________________________________________________________
+____________________________________________________________
+ Here are the tasks in your list:
+Woohoo! No tasks found!
+____________________________________________________________
+____________________________________________________________
+Farewell! Hope you stop by again soon!
+____________________________________________________________
+```
+
+## Test case: reject missing task numbers
+
+**Aim:** Verify that task-changing commands without a number display errors and input ending without `bye` exits cleanly.
+
+**Inputs:**
+```text
+mark
+unmark
+delete
+```
+
+**Command:**
+```powershell
+if (Test-Path data) { Remove-Item -Recurse -Force data }; javac -d _temp\ui-test-classes src\main\java\*.java; @("mark", "unmark", "delete") | java -cp _temp\ui-test-classes ErmActually
+```
+
+**Expected output:**
+```text
+____________________________________________________________
++----------------+
+|  Erm Actually  |
++----------------+
+Greetings! I'm Erm Actually.
+What can I actually do for you?
+____________________________________________________________
+____________________________________________________________
+ uhohhhh... Please provide a valid task number.
+____________________________________________________________
+____________________________________________________________
+ uhohhhh... Please provide a valid task number.
+____________________________________________________________
+____________________________________________________________
+ uhohhhh... Please provide a valid task number.
 ____________________________________________________________
 ```
