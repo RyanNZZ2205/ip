@@ -1,12 +1,15 @@
+/**
+ * Represents a task that has a deadline.
+ */
 public class Deadline extends Task {
     protected String by;
 
     /**
      * Creates a deadline with a description and deadline value.
      *
-     * @param description task description
-     * @param by deadline value
-     * @throws ErmActuallyException if either required value is empty
+     * @param description Task description.
+     * @param by Deadline value.
+     * @throws ErmActuallyException If either required value is empty.
      */
     public Deadline(String description, String by) throws ErmActuallyException {
         super(validateDescription(description), TaskType.DEADLINE);

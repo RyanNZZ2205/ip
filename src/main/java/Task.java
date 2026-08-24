@@ -6,12 +6,23 @@ public class Task {
     protected boolean isDone;
     protected TaskType taskType;
 
+    /**
+     * Creates an unfinished task with the given description and type.
+     *
+     * @param description Task description.
+     * @param taskType Task type.
+     */
     public Task(String description, TaskType taskType) {
         this.description = description;
         this.taskType = taskType;
         this.isDone = false;
     }
 
+    /**
+     * Returns the icon representing this task's completion status.
+     *
+     * @return "X" when the task is complete; otherwise, a space.
+     */
     public String getStatusIcon() {
         return isDone ? "X" : " ";
     }
@@ -26,13 +37,19 @@ public class Task {
         isDone = false;
     }
 
+    /**
+     * Returns whether this task is complete.
+     *
+     * @return True if the task is complete.
+     */
     public boolean isDone() {
         return isDone;
     }
+
     /**
      * Returns this task in the format used by the list command.
      *
-     * @return the task status and description
+     * @return The task status and description.
      */
     @Override
     public String toString() {

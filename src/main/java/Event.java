@@ -1,3 +1,6 @@
+/**
+ * Represents a task that occurs over a specified period.
+ */
 public class Event extends Task {
     protected String from;
     protected String to;
@@ -5,10 +8,10 @@ public class Event extends Task {
     /**
      * Creates an event with a description, start time, and end time.
      *
-     * @param description task description
-     * @param from event start time
-     * @param to event end time
-     * @throws ErmActuallyException if a required value is empty
+     * @param description Task description.
+     * @param from Event start time.
+     * @param to Event end time.
+     * @throws ErmActuallyException If a required value is empty.
      */
     public Event(String description, String from, String to) throws ErmActuallyException {
         super(validateDescription(description), TaskType.EVENT);
@@ -35,4 +38,3 @@ public class Event extends Task {
         return super.toString() + " (from: " + from + " to: " + to + ")";
     }
 }
-

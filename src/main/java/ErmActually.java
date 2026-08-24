@@ -1,10 +1,10 @@
-import java.util.Scanner;
-import java.util.ArrayList;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Base64;
+import java.util.Scanner;
 
 /**
  * Starts ErmActually, loading saved tasks before greeting the user and processing commands.
@@ -13,10 +13,11 @@ public class ErmActually {
     private static final Path SAVE_FILE = Path.of("data", "ErmActually.txt");
     private static final String SAVE_FORMAT_VERSION = "V2";
     private static final String FIELD_SEPARATOR = " | ";
+
     /**
      * Runs the command loop until the user enters {@code bye}.
      *
-     * @param args command-line arguments, which this application does not use
+     * @param args Command-line arguments, which this application does not use.
      */
     public static void main(String[] args) {
         String banner = "+----------------+\n"
@@ -42,17 +43,12 @@ public class ErmActually {
         while (scanner.hasNextLine()) {
             String command = scanner.nextLine().trim();
 
-            //Bye Command
-            if (command.equals("bye")) {
+            if (command.equals("bye")) { //bye command
                 System.out.println(line);
                 System.out.println(farewell);
                 System.out.println(line);
                 break;
-            }
-
-            //List Command
-            else if (command.equals("list")) {
-
+            } else if (command.equals("list")) { //list command
                 System.out.println(line);
                 System.out.println(" Here are the tasks in your list:");
 
@@ -65,10 +61,7 @@ public class ErmActually {
                 }
 
                 System.out.println(line);
-            }
-
-            //mark command
-            else if (command.equals("mark") || command.startsWith("mark ")) {
+            } else if (command.equals("mark") || command.startsWith("mark ")) { //mark command
                 try {
                     int taskIndex = parseTaskIndex(command, "mark");
 
@@ -84,11 +77,7 @@ public class ErmActually {
                 } catch (IndexOutOfBoundsException e) {
                     showError("That task number does not exist.");
                 }
-            }
-
-
-            //unmark command
-            else if (command.equals("unmark") || command.startsWith("unmark ")) {
+            } else if (command.equals("unmark") || command.startsWith("unmark ")) { //unmark command
                 try {
                     int taskIndex = parseTaskIndex(command, "unmark");
 
@@ -104,10 +93,7 @@ public class ErmActually {
                 } catch (IndexOutOfBoundsException e) {
                     showError("That task number does not exist.");
                 }
-            }
-
-            //delete command
-            else if (command.equals("delete") || command.startsWith("delete ")) {
+            } else if (command.equals("delete") || command.startsWith("delete ")) { //delete command
                 try {
                     int index = parseTaskIndex(command, "delete");
 
@@ -125,10 +111,7 @@ public class ErmActually {
                 } catch (IndexOutOfBoundsException e) {
                     showError("That task number does not exist.");
                 }
-            }
-
-            //todo command
-            else if (command.equals("todo") || command.startsWith("todo ")) {
+            } else if (command.equals("todo") || command.startsWith("todo ")) { //todo command
                 try {
                     String description = command.substring(4).trim();
 
@@ -146,7 +129,7 @@ public class ErmActually {
                     showError(e.getMessage());
                 }
 
-            } else if (command.equals("deadline") || command.startsWith("deadline ")) {
+            } else if (command.equals("deadline") || command.startsWith("deadline ")) { //deadline command
                 try {
                     String details = command.substring(8).trim();
 
@@ -154,7 +137,7 @@ public class ErmActually {
 
                     if (parts.length != 2) {
                         throw new ErmActuallyException("Please /by for the deadline.");
-                }
+                    }
 
                     String description = parts[0].trim();
                     String by = parts[1].trim();
@@ -176,11 +159,7 @@ public class ErmActually {
                 } catch (ErmActuallyException e) {
                     showError(e.getMessage());
                 }
-            }
-
-            //event commmand
-            else if (command.equals("event") || command.startsWith("event ")) {
-
+            } else if (command.equals("event") || command.startsWith("event ")) { //event command
                 try {
                     String details = command.substring(5).trim();
 
@@ -219,16 +198,19 @@ public class ErmActually {
                 } catch (ErmActuallyException e) {
                     showError(e.getMessage());
                 }
-            }
-
-            //unknown commands
-            else {
+            } else {
                 showError("actually.. what are you saying??");
             }
 
         }
     }
 
+    /**
+     * Displays confirmation that a task was added.
+     *
+     * @param task Added task.
+     * @param taskCount Number of tasks in the list.
+     */
     private static void showTaskAdded(Task task, int taskCount) {
         System.out.println("____________________________________________________________");
         System.out.println(" Alright! I've added this new task:");
@@ -240,10 +222,10 @@ public class ErmActually {
     /**
      * Converts the task number after a command into a zero-based list index.
      *
-     * @param command complete user command
-     * @param commandName command keyword at the beginning of the command
-     * @return the zero-based task index
-     * @throws ErmActuallyException if the supplied task number is missing, invalid, or less than one
+     * @param command Complete user command.
+     * @param commandName Command keyword at the beginning of the command.
+     * @return The zero-based task index.
+     * @throws ErmActuallyException If the supplied task number is missing, invalid, or less than one.
      */
     private static int parseTaskIndex(String command, String commandName) throws ErmActuallyException {
         try {
@@ -260,7 +242,7 @@ public class ErmActually {
     /**
      * Saves the current tasks in a versioned text format that safely preserves special characters.
      *
-     * @param tasks tasks to save
+     * @param tasks Tasks to save.
      */
     private static void saveTasks(ArrayList<Task> tasks) {
         ArrayList<String> savedTasks = new ArrayList<>();
@@ -277,9 +259,10 @@ public class ErmActually {
     }
 
     /**
-     * Loads tasks saved by {@link #saveTasks(ArrayList)}. A missing save file means the task list starts empty.
+     * Loads tasks saved by {@link #saveTasks(ArrayList)}.
+     * A missing save file means the task list starts empty.
      *
-     * @return the saved tasks, or an empty list when no save file exists
+     * @return The saved tasks, or an empty list when no save file exists.
      */
     private static ArrayList<Task> loadTasks() {
         try {
@@ -301,9 +284,9 @@ public class ErmActually {
     /**
      * Recreates one task from the text format used in the save file.
      *
-     * @param savedTask one line from the save file
-     * @return the recreated task with its saved completion status
-     * @throws ErmActuallyException if the saved task is not valid
+     * @param savedTask One line from the save file.
+     * @return The recreated task with its saved completion status.
+     * @throws ErmActuallyException If the saved task is not valid.
      */
     private static Task createTaskFromSavedLine(String savedTask) throws ErmActuallyException {
         String[] parts = savedTask.split(" \\| ", -1);
@@ -316,9 +299,9 @@ public class ErmActually {
     /**
      * Recreates a task written by the current version of the application.
      *
-     * @param parts fields in a version-two saved task
-     * @return the recreated task
-     * @throws ErmActuallyException if the saved task is invalid
+     * @param parts Fields in a version-two saved task.
+     * @return The recreated task.
+     * @throws ErmActuallyException If the saved task is invalid.
      */
     private static Task createVersionTwoTask(String[] parts) throws ErmActuallyException {
         if (parts.length < 4) {
@@ -338,9 +321,9 @@ public class ErmActually {
     /**
      * Recreates a task written by the earlier plain-text save format.
      *
-     * @param parts fields in a legacy saved task
-     * @return the recreated task
-     * @throws ErmActuallyException if the saved task is invalid
+     * @param parts Fields in a legacy saved task.
+     * @return The recreated task.
+     * @throws ErmActuallyException If the saved task is invalid.
      */
     private static Task createLegacyTask(String[] parts) throws ErmActuallyException {
         if (parts.length < 3) {
@@ -354,11 +337,11 @@ public class ErmActually {
     /**
      * Creates a task after validating its saved type, status, and required details.
      *
-     * @param type saved task type
-     * @param status saved completion status
-     * @param details saved task details
-     * @return the recreated task
-     * @throws ErmActuallyException if the saved task is invalid
+     * @param type Saved task type.
+     * @param status Saved completion status.
+     * @param details Saved task details.
+     * @return The recreated task.
+     * @throws ErmActuallyException If the saved task is invalid.
      */
     private static Task createTask(String type, String status, String[] details) throws ErmActuallyException {
         if (!status.equals("0") && !status.equals("1")) {
@@ -384,8 +367,8 @@ public class ErmActually {
     /**
      * Converts a task to one line of the save-file format.
      *
-     * @param task task to format
-     * @return a text line containing the task's type, completion status, and details
+     * @param task Task to format.
+     * @return A text line containing the task's type, completion status, and details.
      */
     private static String formatTaskForSaving(Task task) {
         String isDone = task.isDone() ? "1" : "0";
@@ -403,10 +386,10 @@ public class ErmActually {
     /**
      * Encodes task details before joining them into one versioned save-file line.
      *
-     * @param type task type
-     * @param status completion status
-     * @param details task details to encode
-     * @return a safely formatted save-file line
+     * @param type Task type.
+     * @param status Completion status.
+     * @param details Task details to encode.
+     * @return A safely formatted save-file line.
      */
     private static String joinSavedFields(String type, String status, String... details) {
         ArrayList<String> fields = new ArrayList<>();
@@ -419,6 +402,11 @@ public class ErmActually {
         return String.join(FIELD_SEPARATOR, fields);
     }
 
+    /**
+     * Displays an error message in the chatbot's output format.
+     *
+     * @param message Error message to display.
+     */
     private static void showError(String message) {
         String line = "____________________________________________________________";
         System.out.println(line);
