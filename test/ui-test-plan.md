@@ -54,17 +54,17 @@ V2 | T | 0 | Ym9ycm93IGJvb2s=
 
 ## Test case: add deadline
 
-**Aim:** Verify that a deadline preserves and displays its `by` value.
+**Aim:** Verify that an ISO-format deadline date is parsed, displayed in a friendly format, and saved in ISO format.
 
 **Inputs:**
 ```text
-deadline return book /by Sunday
+deadline return book /by 2019-12-02
 bye
 ```
 
 **Command:**
 ```powershell
-if (Test-Path data) { Remove-Item -Recurse -Force data }; javac -d _temp\ui-test-classes src\main\java\*.java; @("deadline return book /by Sunday", "bye") | java -cp _temp\ui-test-classes ErmActually
+if (Test-Path data) { Remove-Item -Recurse -Force data }; javac -d _temp\ui-test-classes src\main\java\*.java; @("deadline return book /by 2019-12-02", "bye") | java -cp _temp\ui-test-classes ErmActually; Get-Content data\ErmActually.txt
 ```
 
 **Expected output:**
@@ -78,8 +78,41 @@ What can I actually do for you?
 ____________________________________________________________
 ____________________________________________________________
  Alright! I've added this new task:
-   [D][ ] return book (by: Sunday)
+   [D][ ] return book (by: Dec 02 2019)
  Wow! you have 1 tasks in the list.
+____________________________________________________________
+____________________________________________________________
+Farewell! Hope you stop by again soon!
+____________________________________________________________
+V2 | D | 0 | cmV0dXJuIGJvb2s= | MjAxOS0xMi0wMg==
+```
+
+## Test case: reject invalid deadline date
+
+**Aim:** Verify that a deadline not using a valid `yyyy-MM-dd` date is rejected without adding a task.
+
+**Inputs:**
+```text
+deadline return book /by 2/12/2019
+bye
+```
+
+**Command:**
+```powershell
+if (Test-Path data) { Remove-Item -Recurse -Force data }; javac -d _temp\ui-test-classes src\main\java\*.java; @("deadline return book /by 2/12/2019", "bye") | java -cp _temp\ui-test-classes ErmActually
+```
+
+**Expected output:**
+```text
+____________________________________________________________
++----------------+
+|  Erm Actually  |
++----------------+
+Greetings! I'm Erm Actually.
+What can I actually do for you?
+____________________________________________________________
+____________________________________________________________
+ uhohhhh... Please enter the deadline in yyyy-MM-dd format.
 ____________________________________________________________
 ____________________________________________________________
 Farewell! Hope you stop by again soon!
@@ -219,7 +252,7 @@ ____________________________________________________________
 
 ## Test case: load saved tasks
 
-**Aim:** Verify that legacy todo, deadline, and event tasks, including completion state, are restored when the chatbot starts.
+**Aim:** Verify that legacy todo, deadline, and event tasks, including a valid ISO deadline and completion state, are restored when the chatbot starts.
 
 **Inputs:**
 ```text
@@ -229,7 +262,7 @@ bye
 
 **Command:**
 ```powershell
-New-Item -ItemType Directory -Force data | Out-Null; @("T | 1 | borrow book", "D | 0 | return book | Sunday", "E | 0 | project meeting | Mon 2pm | 4pm") | Set-Content data\ErmActually.txt; javac -d _temp\ui-test-classes src\main\java\*.java; @("list", "bye") | java -cp _temp\ui-test-classes ErmActually
+New-Item -ItemType Directory -Force data | Out-Null; @("T | 1 | borrow book", "D | 0 | return book | 2019-12-02", "E | 0 | project meeting | Mon 2pm | 4pm") | Set-Content data\ErmActually.txt; javac -d _temp\ui-test-classes src\main\java\*.java; @("list", "bye") | java -cp _temp\ui-test-classes ErmActually
 ```
 
 **Expected output:**
@@ -244,7 +277,7 @@ ____________________________________________________________
 ____________________________________________________________
  Here are the tasks in your list:
  1. [T][X] borrow book
- 2. [D][ ] return book (by: Sunday)
+ 2. [D][ ] return book (by: Dec 02 2019)
  3. [E][ ] project meeting (from: Mon 2pm to: 4pm)
 ____________________________________________________________
 ____________________________________________________________

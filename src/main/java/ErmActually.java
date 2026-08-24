@@ -374,7 +374,7 @@ public class ErmActually {
         String isDone = task.isDone() ? "1" : "0";
         if (task instanceof Deadline) {
             Deadline deadline = (Deadline) task;
-            return joinSavedFields("D", isDone, deadline.description, deadline.by);
+            return joinSavedFields("D", isDone, deadline.description, deadline.by.toString());
         }
         if (task instanceof Event) {
             Event event = (Event) task;
