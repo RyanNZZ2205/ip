@@ -147,7 +147,7 @@ Greetings! I'm Erm Actually.
 What can I actually do for you?
 ____________________________________________________________
 ____________________________________________________________
- uhohhhh... Please enter the deadline in yyyy-MM-dd format.
+ uhohhhh... Please enter the deadline in yyyy-MM-dd or yyyy-MM-dd HHmm format.
 ____________________________________________________________
 ____________________________________________________________
 Farewell! Hope you stop by again soon!
@@ -441,7 +441,7 @@ ____________________________________________________________
  Here are the tasks in your list:
  1. [T][X] borrow book
  2. [D][ ] return book (by: Dec 02 2019)
- 3. [E][ ] project meeting (from: Mon 2pm to: 4pm)
+ 3. [E][ ] project meeting (from: Dec 02 2019 2:00 PM to: Dec 02 2019 4:00 PM)
 ____________________________________________________________
 ____________________________________________________________
 Farewell! Hope you stop by again soon!
