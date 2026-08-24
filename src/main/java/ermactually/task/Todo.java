@@ -1,3 +1,7 @@
+package ermactually.task;
+
+import ermactually.ErmActuallyException;
+
 /**
  * Represents a task without a date or time.
  */

@@ -1,5 +1,11 @@
+package ermactually;
+
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
+
+import ermactually.task.Deadline;
+import ermactually.task.Event;
+import ermactually.task.Todo;
 
 /**
  * Recognizes user commands and converts their arguments into application values.

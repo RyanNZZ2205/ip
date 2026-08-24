@@ -1,6 +1,11 @@
+package ermactually;
+
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Scanner;
+
+import ermactually.task.Task;
+import ermactually.task.TaskList;
 
 /**
  * Handles all console input and output for ErmActually.
