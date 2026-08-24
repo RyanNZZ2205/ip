@@ -1,25 +1,28 @@
 import java.nio.file.Path;
 
 /**
- * Starts ErmActually, loading saved tasks before greeting the user and processing commands.
+ * Coordinates the user interface, task storage, task list, and command processing.
  */
 public class ErmActually {
+    private final Storage storage;
+    private final Ui ui;
+    private TaskList tasks;
+
     /**
-     * Runs the command loop until the user enters {@code bye}.
+     * Creates the application with a console interface and file-backed storage.
      *
-     * @param args Command-line arguments, which this application does not use.
+     * @param filePath Path of the file used to store tasks.
      */
-    public static void main(String[] args) {
-        Ui ui = new Ui();
-        Storage storage = new Storage(Path.of("data", "ErmActually.txt"));
+    public ErmActually(String filePath) {
+        this.ui = new Ui();
+        this.storage = new Storage(Path.of(filePath));
+        this.tasks = new TaskList();
+    }
+
+    /** Runs the application until input ends or the user enters {@code bye}. */
+    public void run() {
         ui.showWelcome();
-        TaskList tasks;
-        try {
-            tasks = new TaskList(storage.load());
-        } catch (ErmActuallyException e) {
-            ui.showError(e.getMessage());
-            tasks = new TaskList();
-        }
+        loadTasks();
 
         while (ui.hasNextCommand()) {
             String command = ui.readCommand();
@@ -37,28 +40,28 @@ public class ErmActually {
                 case MARK:
                     int markIndex = Parser.parseTaskIndex(command);
                     tasks.mark(markIndex);
-                    saveTasks(storage, tasks, ui);
+                    saveTasks();
                     ui.showTaskMarked(tasks.get(markIndex));
                     break;
                 case UNMARK:
                     int unmarkIndex = Parser.parseTaskIndex(command);
                     tasks.unmark(unmarkIndex);
-                    saveTasks(storage, tasks, ui);
+                    saveTasks();
                     ui.showTaskUnmarked(tasks.get(unmarkIndex));
                     break;
                 case DELETE:
                     Task removedTask = tasks.delete(Parser.parseTaskIndex(command));
-                    saveTasks(storage, tasks, ui);
+                    saveTasks();
                     ui.showTaskDeleted(removedTask, tasks.size());
                     break;
                 case TODO:
-                    addTask(Parser.parseTodo(command), tasks, storage, ui);
+                    addTask(Parser.parseTodo(command));
                     break;
                 case DEADLINE:
-                    addTask(Parser.parseDeadline(command), tasks, storage, ui);
+                    addTask(Parser.parseDeadline(command));
                     break;
                 case EVENT:
-                    addTask(Parser.parseEvent(command), tasks, storage, ui);
+                    addTask(Parser.parseEvent(command));
                     break;
                 case UNKNOWN:
                     ui.showError("actually.. what are you saying??");
@@ -72,28 +75,29 @@ public class ErmActually {
         }
     }
 
+    /** Loads saved tasks, falling back to an empty task list when loading fails. */
+    private void loadTasks() {
+        try {
+            tasks = new TaskList(storage.load());
+        } catch (ErmActuallyException e) {
+            ui.showError(e.getMessage());
+            tasks = new TaskList();
+        }
+    }
+
     /**
      * Adds and saves a parsed task, then displays its confirmation.
      *
      * @param task Parsed task to add.
-     * @param tasks Current task list.
-     * @param storage Storage used to save the updated list.
-     * @param ui Console interface used to show the result.
      */
-    private static void addTask(Task task, TaskList tasks, Storage storage, Ui ui) {
+    private void addTask(Task task) {
         tasks.add(task);
-        saveTasks(storage, tasks, ui);
+        saveTasks();
         ui.showTaskAdded(task, tasks.size());
     }
 
-    /**
-     * Saves the task list and reports a failure without interrupting the command response.
-     *
-     * @param storage Storage used to write the tasks.
-     * @param tasks Current tasks.
-     * @param ui Console interface used to report a failure.
-     */
-    private static void saveTasks(Storage storage, TaskList tasks, Ui ui) {
+    /** Saves the task list and reports a failure without interrupting the command response. */
+    private void saveTasks() {
         try {
             storage.save(tasks);
         } catch (ErmActuallyException e) {
@@ -101,4 +105,12 @@ public class ErmActually {
         }
     }
 
+    /**
+     * Starts ErmActually using the default task data file.
+     *
+     * @param args Command-line arguments, which this application does not use.
+     */
+    public static void main(String[] args) {
+        new ErmActually("data/ErmActually.txt").run();
+    }
 }
