@@ -4,7 +4,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Base64;
-import java.util.Scanner;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 
@@ -22,47 +21,18 @@ public class ErmActually {
      * @param args Command-line arguments, which this application does not use.
      */
     public static void main(String[] args) {
-        String banner = "+----------------+\n"
-                + "|  Erm Actually  |\n"
-                + "+----------------+";
+        Ui ui = new Ui();
+        ui.showWelcome();
+        ArrayList<Task> tasks = loadTasks(ui);
 
-        String line = "____________________________________________________________";
-
-        String welcome = "Greetings! I'm Erm Actually.\n"
-                + "What can I actually do for you?";
-
-        String farewell = "Farewell! Hope you stop by again soon!";
-
-        System.out.println(line);
-        System.out.println(banner);
-        System.out.println(welcome);
-        System.out.println(line);
-
-        Scanner scanner = new Scanner(System.in);
-
-        ArrayList<Task> tasks = loadTasks();
-
-        while (scanner.hasNextLine()) {
-            String command = scanner.nextLine().trim();
+        while (ui.hasNextCommand()) {
+            String command = ui.readCommand();
 
             if (command.equals("bye")) { //bye command
-                System.out.println(line);
-                System.out.println(farewell);
-                System.out.println(line);
+                ui.showFarewell();
                 break;
             } else if (command.equals("list")) { //list command
-                System.out.println(line);
-                System.out.println(" Here are the tasks in your list:");
-
-                if (tasks.isEmpty()) {
-                    System.out.println("Woohoo! No tasks found!");
-                } else {
-                    for (int i = 0; i < tasks.size(); i++) {
-                        System.out.println(" " + (i + 1) + ". " + tasks.get(i));
-                    }
-                }
-
-                System.out.println(line);
+                ui.showTaskList(tasks);
             } else if (command.equals("on") || command.startsWith("on ")) { //date search command
                 try {
                     String dateText = command.substring(2).trim();
@@ -70,61 +40,48 @@ public class ErmActually {
                         throw new ErmActuallyException("Please provide a date in yyyy-MM-dd format.");
                     }
                     LocalDate requestedDate = LocalDate.parse(dateText);
-                    showTasksOnDate(tasks, requestedDate, line);
+                    ui.showTasksOnDate(tasks, requestedDate);
                 } catch (DateTimeParseException e) {
-                    showError("Please provide a valid date in yyyy-MM-dd format.");
+                    ui.showError("Please provide a valid date in yyyy-MM-dd format.");
                 } catch (ErmActuallyException e) {
-                    showError(e.getMessage());
+                    ui.showError(e.getMessage());
                 }
             } else if (command.equals("mark") || command.startsWith("mark ")) { //mark command
                 try {
                     int taskIndex = parseTaskIndex(command, "mark");
 
                     tasks.get(taskIndex).markAsDone();
-                    saveTasks(tasks);
-
-                    System.out.println(line);
-                    System.out.println("oh! good job you've actually finished this task:");
-                    System.out.println(" " + tasks.get(taskIndex));
-                    System.out.println(line);
+                    saveTasks(tasks, ui);
+                    ui.showTaskMarked(tasks.get(taskIndex));
                 } catch (ErmActuallyException e) {
-                    showError(e.getMessage());
+                    ui.showError(e.getMessage());
                 } catch (IndexOutOfBoundsException e) {
-                    showError("That task number does not exist.");
+                    ui.showError("That task number does not exist.");
                 }
             } else if (command.equals("unmark") || command.startsWith("unmark ")) { //unmark command
                 try {
                     int taskIndex = parseTaskIndex(command, "unmark");
 
                     tasks.get(taskIndex).unmarkAsDone();
-                    saveTasks(tasks);
-
-                    System.out.println(line);
-                    System.out.println("oh? okay then I'll unmark it for you:");
-                    System.out.println("  " + tasks.get(taskIndex));
-                    System.out.println(line);
+                    saveTasks(tasks, ui);
+                    ui.showTaskUnmarked(tasks.get(taskIndex));
                 } catch (ErmActuallyException e) {
-                    showError(e.getMessage());
+                    ui.showError(e.getMessage());
                 } catch (IndexOutOfBoundsException e) {
-                    showError("That task number does not exist.");
+                    ui.showError("That task number does not exist.");
                 }
             } else if (command.equals("delete") || command.startsWith("delete ")) { //delete command
                 try {
                     int index = parseTaskIndex(command, "delete");
 
                     Task removedTask = tasks.remove(index);
-                    saveTasks(tasks);
-
-                    System.out.println(line);
-                    System.out.println(" Noted. I've removed this task:");
-                    System.out.println("   " + removedTask);
-                    System.out.println(" Now you have " + tasks.size() + " tasks in the list.");
-                    System.out.println(line);
+                    saveTasks(tasks, ui);
+                    ui.showTaskDeleted(removedTask, tasks.size());
 
                 } catch (ErmActuallyException e) {
-                    showError(e.getMessage());
+                    ui.showError(e.getMessage());
                 } catch (IndexOutOfBoundsException e) {
-                    showError("That task number does not exist.");
+                    ui.showError("That task number does not exist.");
                 }
             } else if (command.equals("todo") || command.startsWith("todo ")) { //todo command
                 try {
@@ -137,11 +94,11 @@ public class ErmActually {
                     Task toDoTask = new Todo(description);
 
                     tasks.add(toDoTask);
-                    saveTasks(tasks);
+                    saveTasks(tasks, ui);
 
-                    showTaskAdded(toDoTask, tasks.size());
+                    ui.showTaskAdded(toDoTask, tasks.size());
                 } catch (ErmActuallyException e) {
-                    showError(e.getMessage());
+                    ui.showError(e.getMessage());
                 }
 
             } else if (command.equals("deadline") || command.startsWith("deadline ")) { //deadline command
@@ -168,11 +125,11 @@ public class ErmActually {
                     Task deadlineTask = new Deadline(description, by);
 
                     tasks.add(deadlineTask);
-                    saveTasks(tasks);
+                    saveTasks(tasks, ui);
 
-                    showTaskAdded(deadlineTask, tasks.size());
+                    ui.showTaskAdded(deadlineTask, tasks.size());
                 } catch (ErmActuallyException e) {
-                    showError(e.getMessage());
+                    ui.showError(e.getMessage());
                 }
             } else if (command.equals("event") || command.startsWith("event ")) { //event command
                 try {
@@ -206,60 +163,18 @@ public class ErmActually {
                     Task task = new Event(description, from, to);
 
                     tasks.add(task);
-                    saveTasks(tasks);
+                    saveTasks(tasks, ui);
 
-                    showTaskAdded(task, tasks.size());
+                    ui.showTaskAdded(task, tasks.size());
 
                 } catch (ErmActuallyException e) {
-                    showError(e.getMessage());
+                    ui.showError(e.getMessage());
                 }
             } else {
-                showError("actually.. what are you saying??");
+                ui.showError("actually.. what are you saying??");
             }
 
         }
-    }
-
-    /**
-     * Displays confirmation that a task was added.
-     *
-     * @param task Added task.
-     * @param taskCount Number of tasks in the list.
-     */
-    private static void showTaskAdded(Task task, int taskCount) {
-        System.out.println("____________________________________________________________");
-        System.out.println(" Alright! I've added this new task:");
-        System.out.println("   " + task);
-        System.out.println(" Wow! you have " + taskCount + " tasks in the list.");
-        System.out.println("____________________________________________________________");
-    }
-
-    /**
-     * Displays deadlines and events that occur on a requested date, retaining their list numbers.
-     *
-     * @param tasks Complete task list to search.
-     * @param requestedDate Date on which tasks should occur.
-     * @param line Separator used by the console interface.
-     */
-    private static void showTasksOnDate(ArrayList<Task> tasks, LocalDate requestedDate, String line) {
-        System.out.println(line);
-        System.out.println(" Here are the tasks occurring on " + requestedDate + ":");
-        boolean hasMatch = false;
-        for (int i = 0; i < tasks.size(); i++) {
-            Task task = tasks.get(i);
-            boolean occursOnDate = task instanceof Deadline
-                    && ((Deadline) task).occursOn(requestedDate);
-            occursOnDate = occursOnDate || task instanceof Event
-                    && ((Event) task).occursOn(requestedDate);
-            if (occursOnDate) {
-                System.out.println(" " + (i + 1) + ". " + task);
-                hasMatch = true;
-            }
-        }
-        if (!hasMatch) {
-            System.out.println(" No deadlines or events found.");
-        }
-        System.out.println(line);
     }
 
     /**
@@ -287,7 +202,7 @@ public class ErmActually {
      *
      * @param tasks Tasks to save.
      */
-    private static void saveTasks(ArrayList<Task> tasks) {
+    private static void saveTasks(ArrayList<Task> tasks, Ui ui) {
         ArrayList<String> savedTasks = new ArrayList<>();
         for (Task task : tasks) {
             savedTasks.add(formatTaskForSaving(task));
@@ -297,17 +212,17 @@ public class ErmActually {
             Files.createDirectories(SAVE_FILE.getParent());
             Files.write(SAVE_FILE, savedTasks);
         } catch (IOException | SecurityException e) {
-            showError("I couldn't save your tasks.");
+            ui.showError("I couldn't save your tasks.");
         }
     }
 
     /**
-     * Loads tasks saved by {@link #saveTasks(ArrayList)}.
+     * Loads tasks saved by {@link #saveTasks(ArrayList, Ui)}.
      * A missing save file means the task list starts empty.
      *
      * @return The saved tasks, or an empty list when no save file exists.
      */
-    private static ArrayList<Task> loadTasks() {
+    private static ArrayList<Task> loadTasks(Ui ui) {
         try {
             if (!Files.exists(SAVE_FILE)) {
                 return new ArrayList<>();
@@ -319,7 +234,7 @@ public class ErmActually {
             }
             return tasks;
         } catch (IOException | SecurityException | ErmActuallyException e) {
-            showError("I couldn't load your tasks.");
+            ui.showError("I couldn't load your tasks.");
             return new ArrayList<>();
         }
     }
@@ -446,15 +361,4 @@ public class ErmActually {
         return String.join(FIELD_SEPARATOR, fields);
     }
 
-    /**
-     * Displays an error message in the chatbot's output format.
-     *
-     * @param message Error message to display.
-     */
-    private static void showError(String message) {
-        String line = "____________________________________________________________";
-        System.out.println(line);
-        System.out.println(" uhohhhh... " + message);
-        System.out.println(line);
-    }
 }
