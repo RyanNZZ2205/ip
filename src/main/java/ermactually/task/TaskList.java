@@ -3,6 +3,7 @@ package ermactually.task;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Locale;
 
 /**
  * Owns the application's task collection and its task-list operations.
@@ -62,6 +63,25 @@ public class TaskList implements Iterable<Task> {
     /** @return Whether the task list has no tasks. */
     public boolean isEmpty() {
         return tasks.isEmpty();
+    }
+
+    /**
+     * Finds the original zero-based indexes of tasks whose descriptions contain a keyword.
+     * Matching is case-insensitive and preserves task-list order.
+     *
+     * @param keyword Keyword to search for in task descriptions.
+     * @return Matching indexes in task-list order.
+     */
+    public ArrayList<Integer> findIndexes(String keyword) {
+        String normalizedKeyword = keyword.toLowerCase(Locale.ROOT);
+        ArrayList<Integer> indexes = new ArrayList<>();
+        for (int i = 0; i < tasks.size(); i++) {
+            String normalizedDescription = tasks.get(i).getDescription().toLowerCase(Locale.ROOT);
+            if (normalizedDescription.contains(normalizedKeyword)) {
+                indexes.add(i);
+            }
+        }
+        return indexes;
     }
 
     /**

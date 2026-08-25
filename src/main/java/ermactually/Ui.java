@@ -58,6 +58,20 @@ public class Ui {
         System.out.println(LINE);
     }
 
+    /** Displays tasks whose descriptions contain the requested keyword. */
+    public void showMatchingTasks(TaskList tasks, String keyword) {
+        System.out.println(LINE);
+        System.out.println(" Here are the matching tasks in your list:");
+        ArrayList<Integer> matchingIndexes = tasks.findIndexes(keyword);
+        for (int index : matchingIndexes) {
+            System.out.println(" " + (index + 1) + ". " + tasks.get(index));
+        }
+        if (matchingIndexes.isEmpty()) {
+            System.out.println(" No matching tasks found.");
+        }
+        System.out.println(LINE);
+    }
+
     /** Displays deadlines and events occurring on a requested date. */
     public void showTasksOnDate(TaskList tasks, LocalDate requestedDate) {
         System.out.println(LINE);

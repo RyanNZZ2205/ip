@@ -275,6 +275,67 @@ Farewell! Hope you stop by again soon!
 ____________________________________________________________
 ```
 
+## Test case: find tasks by description keyword
+
+**Aim:** Verify that keyword search is case-insensitive, includes every task type, preserves original task numbers, reports no matches, and rejects a missing keyword.
+
+**Inputs:**
+```text
+todo Read Book
+todo buy groceries
+deadline return book /by 2026-06-06
+find book
+find movie
+find
+bye
+```
+
+**Command:**
+```powershell
+if (Test-Path data) { Remove-Item -Recurse -Force data }; javac -d _temp\ui-test-classes (Get-ChildItem src\main\java -Recurse -Filter *.java).FullName; @("todo Read Book", "todo buy groceries", "deadline return book /by 2026-06-06", "find book", "find movie", "find", "bye") | java -cp _temp\ui-test-classes ermactually.ErmActually
+```
+
+**Expected output:**
+```text
+____________________________________________________________
++----------------+
+|  Erm Actually  |
++----------------+
+Greetings! I'm Erm Actually.
+What can I actually do for you?
+____________________________________________________________
+____________________________________________________________
+ Alright! I've added this new task:
+   [T][ ] Read Book
+ Wow! you have 1 tasks in the list.
+____________________________________________________________
+____________________________________________________________
+ Alright! I've added this new task:
+   [T][ ] buy groceries
+ Wow! you have 2 tasks in the list.
+____________________________________________________________
+____________________________________________________________
+ Alright! I've added this new task:
+   [D][ ] return book (by: Jun 06 2026)
+ Wow! you have 3 tasks in the list.
+____________________________________________________________
+____________________________________________________________
+ Here are the matching tasks in your list:
+ 1. [T][ ] Read Book
+ 3. [D][ ] return book (by: Jun 06 2026)
+____________________________________________________________
+____________________________________________________________
+ Here are the matching tasks in your list:
+ No matching tasks found.
+____________________________________________________________
+____________________________________________________________
+ uhohhhh... Please provide a keyword to find.
+____________________________________________________________
+____________________________________________________________
+Farewell! Hope you stop by again soon!
+____________________________________________________________
+```
+
 ## Test case: handle date search without matches and invalid dates
 
 **Aim:** Verify that date search reports no matches and rejects missing or invalid dates.
