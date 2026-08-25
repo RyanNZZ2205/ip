@@ -10,6 +10,11 @@ public enum TaskType {
 
     private final String symbol;
 
+    /**
+     * Creates a task type with its display symbol.
+     *
+     * @param symbol Symbol used to identify this task type in the console UI.
+     */
     TaskType(String symbol) {
         this.symbol = symbol;
     }
