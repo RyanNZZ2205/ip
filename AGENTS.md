@@ -42,6 +42,7 @@ Maintain JUnit tests for approximately the top 50% highest-value methods, priori
 
 ## Git
 
+All branch names and commit messages in this project must follow the project-local `$seedu-git-standard` skill. Invoke the skill when proposing, reviewing, or creating a branch name or commit, and correct applicable violations before using them.
 Use lightweight tags unless the user requests an annotated tag.
 When proposing or creating a commit message, include enough detail to explain the rationale for the change.
 Do not commit or push unless explicitly asked.
