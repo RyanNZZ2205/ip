@@ -33,44 +33,44 @@ public class ErmActually {
             String command = ui.readCommand();
             try {
                 switch (Parser.getCommandType(command)) {
-                case BYE:
-                    ui.showFarewell();
-                    return;
-                case LIST:
-                    ui.showTaskList(tasks);
-                    break;
-                case ON:
-                    ui.showTasksOnDate(tasks, Parser.parseDate(command));
-                    break;
-                case MARK:
-                    int markIndex = Parser.parseTaskIndex(command);
-                    tasks.mark(markIndex);
-                    saveTasks();
-                    ui.showTaskMarked(tasks.get(markIndex));
-                    break;
-                case UNMARK:
-                    int unmarkIndex = Parser.parseTaskIndex(command);
-                    tasks.unmark(unmarkIndex);
-                    saveTasks();
-                    ui.showTaskUnmarked(tasks.get(unmarkIndex));
-                    break;
-                case DELETE:
-                    Task removedTask = tasks.delete(Parser.parseTaskIndex(command));
-                    saveTasks();
-                    ui.showTaskDeleted(removedTask, tasks.size());
-                    break;
-                case TODO:
-                    addTask(Parser.parseTodo(command));
-                    break;
-                case DEADLINE:
-                    addTask(Parser.parseDeadline(command));
-                    break;
-                case EVENT:
-                    addTask(Parser.parseEvent(command));
-                    break;
-                case UNKNOWN:
-                    ui.showError("actually.. what are you saying??");
-                    break;
+                    case BYE:
+                        ui.showFarewell();
+                        return;
+                    case LIST:
+                        ui.showTaskList(tasks);
+                        break;
+                    case ON:
+                        ui.showTasksOnDate(tasks, Parser.parseDate(command));
+                        break;
+                    case MARK:
+                        int markIndex = Parser.parseTaskIndex(command);
+                        tasks.mark(markIndex);
+                        saveTasks();
+                        ui.showTaskMarked(tasks.get(markIndex));
+                        break;
+                    case UNMARK:
+                        int unmarkIndex = Parser.parseTaskIndex(command);
+                        tasks.unmark(unmarkIndex);
+                        saveTasks();
+                        ui.showTaskUnmarked(tasks.get(unmarkIndex));
+                        break;
+                    case DELETE:
+                        Task removedTask = tasks.delete(Parser.parseTaskIndex(command));
+                        saveTasks();
+                        ui.showTaskDeleted(removedTask, tasks.size());
+                        break;
+                    case TODO:
+                        addTask(Parser.parseTodo(command));
+                        break;
+                    case DEADLINE:
+                        addTask(Parser.parseDeadline(command));
+                        break;
+                    case EVENT:
+                        addTask(Parser.parseEvent(command));
+                        break;
+                    case UNKNOWN:
+                        ui.showError("actually.. what are you saying??");
+                        break;
                 }
             } catch (ErmActuallyException e) {
                 ui.showError(e.getMessage());
