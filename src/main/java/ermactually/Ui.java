@@ -29,12 +29,12 @@ public class Ui {
         showMessage(banner + "\n" + welcome);
     }
 
-    /** @return Whether another command is available from standard input. */
+    /** Returns whether another command is available from standard input. */
     public boolean hasNextCommand() {
         return scanner.hasNextLine();
     }
 
-    /** @return The next command, with surrounding whitespace removed. */
+    /** Returns the next command with surrounding whitespace removed. */
     public String readCommand() {
         return scanner.nextLine().trim();
     }

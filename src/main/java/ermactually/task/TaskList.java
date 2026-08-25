@@ -54,12 +54,12 @@ public class TaskList implements Iterable<Task> {
         return tasks.get(index);
     }
 
-    /** @return Number of tasks in the list. */
+    /** Returns the number of tasks in the list. */
     public int size() {
         return tasks.size();
     }
 
-    /** @return Whether the task list has no tasks. */
+    /** Returns whether the task list has no tasks. */
     public boolean isEmpty() {
         return tasks.isEmpty();
     }
