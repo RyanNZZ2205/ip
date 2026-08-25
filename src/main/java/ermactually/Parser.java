@@ -13,7 +13,7 @@ import ermactually.task.Todo;
 public class Parser {
     /** Commands understood by ErmActually. */
     public enum CommandType {
-        BYE, LIST, ON, MARK, UNMARK, DELETE, TODO, DEADLINE, EVENT, UNKNOWN
+        BYE, LIST, FIND, ON, MARK, UNMARK, DELETE, TODO, DEADLINE, EVENT, UNKNOWN
     }
 
     /**
@@ -27,6 +27,8 @@ public class Parser {
             return CommandType.BYE;
         } else if (command.equals("list")) {
             return CommandType.LIST;
+        } else if (matchesCommand(command, "find")) {
+            return CommandType.FIND;
         } else if (matchesCommand(command, "on")) {
             return CommandType.ON;
         } else if (matchesCommand(command, "mark")) {
@@ -43,6 +45,21 @@ public class Parser {
             return CommandType.EVENT;
         }
         return CommandType.UNKNOWN;
+    }
+
+    /**
+     * Extracts the keyword supplied to a {@code find} command.
+     *
+     * @param command Complete find command.
+     * @return Non-empty keyword to search for.
+     * @throws ErmActuallyException If no keyword was provided.
+     */
+    public static String parseKeyword(String command) throws ErmActuallyException {
+        String keyword = command.substring("find".length()).trim();
+        if (keyword.isEmpty()) {
+            throw new ErmActuallyException("Please provide a keyword to find.");
+        }
+        return keyword;
     }
 
     /** Parses the one-based task number in a command into a zero-based index. */

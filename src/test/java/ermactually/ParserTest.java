@@ -13,6 +13,25 @@ public class ParserTest {
             "Please provide a valid task number.";
 
     @Test
+    public void getCommandType_findCommand_returnsFind() {
+        assertEquals(Parser.CommandType.FIND, Parser.getCommandType("find book"));
+    }
+
+    @Test
+    public void parseKeyword_validKeyword_returnsTrimmedKeyword() throws ErmActuallyException {
+        assertEquals("read book", Parser.parseKeyword("find   read book   "));
+    }
+
+    @Test
+    public void parseKeyword_missingKeyword_exceptionThrown() {
+        ErmActuallyException exception = assertThrows(
+                ErmActuallyException.class,
+                () -> Parser.parseKeyword("find   "));
+
+        assertEquals("Please provide a keyword to find.", exception.getMessage());
+    }
+
+    @Test
     public void parseTaskIndex_firstTask_returnsZero() throws ErmActuallyException {
         assertEquals(0, Parser.parseTaskIndex("mark 1"));
     }

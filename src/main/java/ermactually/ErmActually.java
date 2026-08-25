@@ -39,6 +39,9 @@ public class ErmActually {
                     case LIST:
                         ui.showTaskList(tasks);
                         break;
+		            case FIND:
+                        ui.showMatchingTasks(tasks, Parser.parseKeyword(command));
+                        break;
                     case ON:
                         ui.showTasksOnDate(tasks, Parser.parseDate(command));
                         break;
