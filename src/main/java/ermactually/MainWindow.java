@@ -23,22 +23,28 @@ public class MainWindow extends AnchorPane {
 
     private ErmActually ermActually;
 
-    private Image userImage = new Image(this.getClass().getResourceAsStream("/images/DaUser.png"));
-    private Image dukeImage = new Image(this.getClass().getResourceAsStream("/images/DaDuke.png"));
+    private final Image userImage = new Image(this.getClass().getResourceAsStream("/images/DaUser.png"));
+    private final Image dukeImage = new Image(this.getClass().getResourceAsStream("/images/DaDuke.png"));
 
     @FXML
     public void initialize() {
         scrollPane.vvalueProperty().bind(dialogContainer.heightProperty());
     }
 
-    /** Injects the ErmActually instance */
-    public void setErmActually(ErmActually e) {
-        ermActually = e;
+    /** Injects the ErmActually instance and displays any task-loading error. */
+    public void setErmActually(ErmActually ermActually) {
+        this.ermActually = ermActually;
+        String startupError = ermActually.getStartupError();
+        if (startupError != null) {
+            dialogContainer.getChildren().add(
+                    DialogBox.getErmActuallyDialog(
+                            startupError, dukeImage, Parser.CommandType.UNKNOWN));
+        }
     }
 
     /**
-     * Creates two dialog boxes, one echoing user input and the other containing ErmActually's reply and then appends them to
-     * the dialog container. Clears the user input after processing.
+     * Creates dialog boxes for the user's input and ErmActually's response.
+     * Clears the user input after processing.
      */
     @FXML
     private void handleUserInput() {

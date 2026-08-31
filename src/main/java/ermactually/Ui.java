@@ -39,90 +39,93 @@ public class Ui {
         return scanner.nextLine().trim();
     }
 
-    /** Displays the farewell message. */
-    public void showFarewell() {
-        showMessage("Farewell! Hope you stop by again soon!");
+    /** Displays a complete response between separator lines. */
+    public void showResponse(String response) {
+        showMessage(response);
     }
 
-    /** Displays every task with its one-based list number. */
-    public void showTaskList(TaskList tasks) {
-        System.out.println(LINE);
-        System.out.println(" Here are the tasks in your list:");
+    /** Formats every task with its one-based list number. */
+    String formatTaskList(TaskList tasks) {
+        StringBuilder response = new StringBuilder(" Here are the tasks in your list:");
         if (tasks.isEmpty()) {
-            System.out.println("Woohoo! No tasks found!");
+            response.append("\nWoohoo! No tasks found!");
         } else {
             for (int i = 0; i < tasks.size(); i++) {
-                System.out.println(" " + (i + 1) + ". " + tasks.get(i));
+                response.append("\n ")
+                        .append(i + 1)
+                        .append(". ")
+                        .append(tasks.get(i));
             }
         }
-        System.out.println(LINE);
+        return response.toString();
     }
 
-    /** Displays tasks whose descriptions contain the requested keyword. */
-    public void showMatchingTasks(TaskList tasks, String keyword) {
-        System.out.println(LINE);
-        System.out.println(" Here are the matching tasks in your list:");
+    /** Formats tasks whose descriptions contain the requested keyword. */
+    String formatMatchingTasks(TaskList tasks, String keyword) {
+        StringBuilder response = new StringBuilder(" Here are the matching tasks in your list:");
         ArrayList<Integer> matchingIndexes = tasks.findIndexes(keyword);
         for (int index : matchingIndexes) {
-            System.out.println(" " + (index + 1) + ". " + tasks.get(index));
+            response.append("\n ")
+                    .append(index + 1)
+                    .append(". ")
+                    .append(tasks.get(index));
         }
         if (matchingIndexes.isEmpty()) {
-            System.out.println(" No matching tasks found.");
+            response.append("\n No matching tasks found.");
         }
-        System.out.println(LINE);
+        return response.toString();
     }
 
-    /** Displays deadlines and events occurring on a requested date. */
-    public void showTasksOnDate(TaskList tasks, LocalDate requestedDate) {
-        System.out.println(LINE);
-        System.out.println(" Here are the tasks occurring on " + requestedDate + ":");
+    /** Formats deadlines and events occurring on a requested date. */
+    String formatTasksOnDate(TaskList tasks, LocalDate requestedDate) {
+        StringBuilder response = new StringBuilder(" Here are the tasks occurring on ")
+                .append(requestedDate)
+                .append(":");
         ArrayList<Integer> matchingIndexes = tasks.findIndexesOn(requestedDate);
         for (int index : matchingIndexes) {
-            System.out.println(" " + (index + 1) + ". " + tasks.get(index));
+            response.append("\n ")
+                    .append(index + 1)
+                    .append(". ")
+                    .append(tasks.get(index));
         }
         if (matchingIndexes.isEmpty()) {
-            System.out.println(" No deadlines or events found.");
+            response.append("\n No deadlines or events found.");
         }
-        System.out.println(LINE);
+        return response.toString();
     }
 
-    /** Displays confirmation that a task was added. */
-    public void showTaskAdded(Task task, int taskCount) {
-        System.out.println(LINE);
-        System.out.println(" Alright! I've added this new task:");
-        System.out.println("   " + task);
-        System.out.println(" Wow! you have " + taskCount + " tasks in the list.");
-        System.out.println(LINE);
+    /** Formats confirmation that a task was added. */
+    String formatTaskAdded(Task task, int taskCount) {
+        return " Alright! I've added this new task:\n"
+                + "   " + task + "\n"
+                + " Wow! you have " + taskCount + " tasks in the list.";
     }
 
-    /** Displays confirmation that a task was marked as done. */
-    public void showTaskMarked(Task task) {
-        System.out.println(LINE);
-        System.out.println("oh! good job you've actually finished this task:");
-        System.out.println(" " + task);
-        System.out.println(LINE);
+    /** Formats confirmation that a task was marked as done. */
+    String formatTaskMarked(Task task) {
+        return "oh! good job you've actually finished this task:\n " + task;
     }
 
-    /** Displays confirmation that a task was unmarked. */
-    public void showTaskUnmarked(Task task) {
-        System.out.println(LINE);
-        System.out.println("oh? okay then I'll unmark it for you:");
-        System.out.println("  " + task);
-        System.out.println(LINE);
+    /** Formats confirmation that a task was unmarked. */
+    String formatTaskUnmarked(Task task) {
+        return "oh? okay then I'll unmark it for you:\n  " + task;
     }
 
-    /** Displays confirmation that a task was deleted. */
-    public void showTaskDeleted(Task task, int taskCount) {
-        System.out.println(LINE);
-        System.out.println(" Noted. I've removed this task:");
-        System.out.println("   " + task);
-        System.out.println(" Now you have " + taskCount + " tasks in the list.");
-        System.out.println(LINE);
+    /** Formats confirmation that a task was deleted. */
+    String formatTaskDeleted(Task task, int taskCount) {
+        return " Noted. I've removed this task:\n"
+                + "   " + task + "\n"
+                + " Now you have " + taskCount + " tasks in the list.";
     }
 
-    /** Displays an error in the chatbot's output format. */
-    public void showError(String message) {
-        showMessage(" uhohhhh... " + message);
+    /** Formats an error in the chatbot's output format. */
+    String formatError(String message) {
+        return " uhohhhh... " + message;
+    }
+
+    /** Formats the farewell message. */
+    String formatFarewell() {
+        return "Farewell! Hope you stop by again soon!";
     }
 
     /** Displays a message between separator lines. */
