@@ -39,7 +39,7 @@ public class ErmActually {
                     case LIST:
                         ui.showTaskList(tasks);
                         break;
-		            case FIND:
+                    case FIND:
                         ui.showMatchingTasks(tasks, Parser.parseKeyword(command));
                         break;
                     case ON:
@@ -71,7 +71,7 @@ public class ErmActually {
                     case EVENT:
                         addTask(Parser.parseEvent(command));
                         break;
-                    case UNKNOWN:
+                    default:
                         ui.showError("actually.. what are you saying??");
                         break;
                 }
