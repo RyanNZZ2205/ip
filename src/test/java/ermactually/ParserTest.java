@@ -24,9 +24,8 @@ public class ParserTest {
 
     @Test
     public void parseKeyword_missingKeyword_exceptionThrown() {
-        ErmActuallyException exception = assertThrows(
-                ErmActuallyException.class,
-                () -> Parser.parseKeyword("find   "));
+        ErmActuallyException exception =
+                assertThrows(ErmActuallyException.class, () -> Parser.parseKeyword("find   "));
 
         assertEquals("Please provide a keyword to find.", exception.getMessage());
     }
@@ -88,9 +87,8 @@ public class ParserTest {
      * @param command command containing an invalid task-number argument
      */
     private void assertInvalidTaskNumber(String command) {
-        ErmActuallyException exception = assertThrows(
-                ErmActuallyException.class,
-                () -> Parser.parseTaskIndex(command));
+        ErmActuallyException exception =
+                assertThrows(ErmActuallyException.class, () -> Parser.parseTaskIndex(command));
 
         assertEquals(INVALID_TASK_NUMBER_MESSAGE, exception.getMessage());
     }

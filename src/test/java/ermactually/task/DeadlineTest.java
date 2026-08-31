@@ -183,9 +183,8 @@ public class DeadlineTest {
      * @param expectedMessage expected validation message
      */
     private void assertConstructorThrows(String description, String by, String expectedMessage) {
-        ErmActuallyException exception = assertThrows(
-                ErmActuallyException.class,
-                () -> new Deadline(description, by));
+        ErmActuallyException exception =
+                assertThrows(ErmActuallyException.class, () -> new Deadline(description, by));
 
         assertEquals(expectedMessage, exception.getMessage());
     }
