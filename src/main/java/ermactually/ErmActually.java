@@ -114,6 +114,16 @@ public class ErmActually {
     }
 
     /**
+     * Generates a response for the user's chat message.
+     *
+     * @param input User's chat message.
+     * @return Generated response.
+     */
+    public String getResponse(String input) {
+        return "Erm Actually heard: " + input;
+    }
+
+    /**
      * Starts ErmActually using the default task data file.
      *
      * @param args Command-line arguments, which this application does not use.
