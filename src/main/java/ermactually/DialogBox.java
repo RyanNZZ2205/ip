@@ -46,6 +46,7 @@ public class DialogBox extends HBox {
         Collections.reverse(tmp);
         getChildren().setAll(tmp);
         setAlignment(Pos.TOP_LEFT);
+        dialog.getStyleClass().add("reply-label");
     }
 
     /**
@@ -60,15 +61,41 @@ public class DialogBox extends HBox {
     }
 
     /**
+     * Applies the response color associated with the processed command.
+     *
+     * @param commandType Type of command that produced the response.
+     */
+    private void changeDialogStyle(Parser.CommandType commandType) {
+        switch (commandType) {
+            case TODO:
+            case DEADLINE:
+            case EVENT:
+                dialog.getStyleClass().add("add-label");
+                break;
+            case MARK:
+            case UNMARK:
+                dialog.getStyleClass().add("marked-label");
+                break;
+            case DELETE:
+                dialog.getStyleClass().add("delete-label");
+                break;
+            default:
+                break;
+        }
+    }
+
+    /**
      * Returns a dialog box for a response sent by ErmActually.
      *
      * @param text Response displayed in the dialog box.
      * @param img Image representing ErmActually.
      * @return Dialog box containing ErmActually's response.
      */
-    public static DialogBox getErmActuallyDialog(String text, Image img) {
+    public static DialogBox getErmActuallyDialog(
+            String text, Image img, Parser.CommandType commandType) {
         var db = new DialogBox(text, img);
         db.flip();
+        db.changeDialogStyle(commandType);
         return db;
     }
 

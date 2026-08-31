@@ -12,6 +12,7 @@ public class ErmActually {
     private final Storage storage;
     private final Ui ui;
     private TaskList tasks;
+    private Parser.CommandType commandType = Parser.CommandType.UNKNOWN;
 
     /**
      * Creates the application with a console interface and file-backed storage.
@@ -120,7 +121,14 @@ public class ErmActually {
      * @return Generated response.
      */
     public String getResponse(String input) {
+        String command = input.trim();
+        commandType = Parser.getCommandType(command);
+
         return "Erm Actually heard: " + input;
+    }
+
+    public Parser.CommandType getCommandType() {
+        return commandType;
     }
 
     /**
