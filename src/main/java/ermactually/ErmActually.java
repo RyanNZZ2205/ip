@@ -82,36 +82,36 @@ public class ErmActually {
 
         try {
             switch (commandType) {
-            case BYE:
-                return ui.formatFarewell();
-            case LIST:
-                return ui.formatTaskList(tasks);
-            case FIND:
-                return ui.formatMatchingTasks(tasks, Parser.parseKeyword(command));
-            case ON:
-                return ui.formatTasksOnDate(tasks, Parser.parseDate(command));
-            case MARK:
-                int markIndex = Parser.parseTaskIndex(command);
-                tasks.mark(markIndex);
-                saveTasks();
-                return ui.formatTaskMarked(tasks.get(markIndex));
-            case UNMARK:
-                int unmarkIndex = Parser.parseTaskIndex(command);
-                tasks.unmark(unmarkIndex);
-                saveTasks();
-                return ui.formatTaskUnmarked(tasks.get(unmarkIndex));
-            case DELETE:
-                Task removedTask = tasks.delete(Parser.parseTaskIndex(command));
-                saveTasks();
-                return ui.formatTaskDeleted(removedTask, tasks.size());
-            case TODO:
-                return addTask(Parser.parseTodo(command));
-            case DEADLINE:
-                return addTask(Parser.parseDeadline(command));
-            case EVENT:
-                return addTask(Parser.parseEvent(command));
-            default:
-                return ui.formatError("actually.. what are you saying??");
+                case BYE:
+                    return ui.formatFarewell();
+                case LIST:
+                    return ui.formatTaskList(tasks);
+                case FIND:
+                    return ui.formatMatchingTasks(tasks, Parser.parseKeyword(command));
+                case ON:
+                    return ui.formatTasksOnDate(tasks, Parser.parseDate(command));
+                case MARK:
+                    int markIndex = Parser.parseTaskIndex(command);
+                    tasks.mark(markIndex);
+                    saveTasks();
+                    return ui.formatTaskMarked(tasks.get(markIndex));
+                case UNMARK:
+                    int unmarkIndex = Parser.parseTaskIndex(command);
+                    tasks.unmark(unmarkIndex);
+                    saveTasks();
+                    return ui.formatTaskUnmarked(tasks.get(unmarkIndex));
+                case DELETE:
+                    Task removedTask = tasks.delete(Parser.parseTaskIndex(command));
+                    saveTasks();
+                    return ui.formatTaskDeleted(removedTask, tasks.size());
+                case TODO:
+                    return addTask(Parser.parseTodo(command));
+                case DEADLINE:
+                    return addTask(Parser.parseDeadline(command));
+                case EVENT:
+                    return addTask(Parser.parseEvent(command));
+                default:
+                    return ui.formatError("actually.. what are you saying??");
             }
         } catch (ErmActuallyException e) {
             commandType = Parser.CommandType.UNKNOWN;
@@ -127,6 +127,7 @@ public class ErmActually {
         return startupError;
     }
 
+    /** Returns the type of the most recently processed command. */
     public Parser.CommandType getCommandType() {
         return commandType;
     }

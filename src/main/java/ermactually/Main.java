@@ -9,13 +9,18 @@ import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 
 /**
- * A GUI for ErmActually using FXML.
+ * Provides the FXML-based graphical user interface for ErmActually.
  */
 public class Main extends Application {
 
     private ErmActually ermActually =
             new ErmActually("data/ErmActually.txt");
 
+    /**
+     * Creates and displays the primary application window.
+     *
+     * @param stage Primary stage supplied by JavaFX.
+     */
     @Override
     public void start(Stage stage) {
         try {
@@ -25,7 +30,7 @@ public class Main extends Application {
             stage.setScene(scene);
             stage.setMinHeight(220);
             stage.setMinWidth(417);
-            fxmlLoader.<MainWindow>getController().setErmActually(ermActually);  // inject the ErmActually instance
+            fxmlLoader.<MainWindow>getController().setErmActually(ermActually); // inject the ErmActually instance
             stage.show();
         } catch (IOException e) {
             e.printStackTrace();
