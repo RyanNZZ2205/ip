@@ -55,6 +55,8 @@ public class Parser {
      * @throws ErmActuallyException If no keyword was provided.
      */
     public static String parseKeyword(String command) throws ErmActuallyException {
+        assert getCommandType(command) == CommandType.FIND
+                : "parseKeyword must receive a find command";
         String keyword = command.substring("find".length()).trim();
         if (keyword.isEmpty()) {
             throw new ErmActuallyException("Please provide a keyword to find.");
@@ -64,6 +66,11 @@ public class Parser {
 
     /** Parses the one-based task number in a command into a zero-based index. */
     public static int parseTaskIndex(String command) throws ErmActuallyException {
+        CommandType commandType = getCommandType(command);
+        assert commandType == CommandType.MARK
+                || commandType == CommandType.UNMARK
+                || commandType == CommandType.DELETE
+                : "parseTaskIndex must receive a task-changing command";
         int firstSpace = command.indexOf(' ');
         String argument = firstSpace < 0 ? "" : command.substring(firstSpace + 1).trim();
         try {
@@ -79,6 +86,8 @@ public class Parser {
 
     /** Parses the ISO date supplied to an {@code on} command. */
     public static LocalDate parseDate(String command) throws ErmActuallyException {
+        assert getCommandType(command) == CommandType.ON
+                : "parseDate must receive an on command";
         String dateText = command.substring("on".length()).trim();
         if (dateText.isEmpty()) {
             throw new ErmActuallyException("Please provide a date in yyyy-MM-dd format.");
@@ -92,6 +101,8 @@ public class Parser {
 
     /** Creates a todo from a validated {@code todo} command. */
     public static Todo parseTodo(String command) throws ErmActuallyException {
+        assert getCommandType(command) == CommandType.TODO
+                : "parseTodo must receive a todo command";
         String description = command.substring("todo".length()).trim();
         if (description.isEmpty()) {
             throw new ErmActuallyException("Please add a description for todo!");
@@ -101,6 +112,8 @@ public class Parser {
 
     /** Creates a deadline from a validated {@code deadline} command. */
     public static Deadline parseDeadline(String command) throws ErmActuallyException {
+        assert getCommandType(command) == CommandType.DEADLINE
+                : "parseDeadline must receive a deadline command";
         String details = command.substring("deadline".length()).trim();
         String[] parts = details.split(" /by", 2);
         if (parts.length != 2) {
@@ -120,6 +133,8 @@ public class Parser {
 
     /** Creates an event from a validated {@code event} command. */
     public static Event parseEvent(String command) throws ErmActuallyException {
+        assert getCommandType(command) == CommandType.EVENT
+                : "parseEvent must receive an event command";
         String details = command.substring("event".length()).trim();
         String[] fromSplit = details.split("/from", 2);
         if (fromSplit.length != 2) {
