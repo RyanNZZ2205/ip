@@ -5,6 +5,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Base64;
 
 import ermactually.task.Deadline;
@@ -90,11 +91,12 @@ public class Storage {
         if (parts.length < 4) {
             throw invalidSavedTask();
         }
-        String[] details = new String[parts.length - 3];
+        String[] details;
         try {
-            for (int i = 3; i < parts.length; i++) {
-                details[i - 3] = new String(Base64.getDecoder().decode(parts[i]), StandardCharsets.UTF_8);
-            }
+            details = Arrays.stream(parts, 3, parts.length)
+                    .map(encodedDetail -> new String(
+                            Base64.getDecoder().decode(encodedDetail), StandardCharsets.UTF_8))
+                    .toArray(String[]::new);
         } catch (IllegalArgumentException e) {
             throw invalidSavedTask();
         }
