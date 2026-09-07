@@ -91,19 +91,11 @@ public class ErmActually {
                 case ON:
                     return ui.formatTasksOnDate(tasks, Parser.parseDate(command));
                 case MARK:
-                    int markIndex = Parser.parseTaskIndex(command);
-                    tasks.mark(markIndex);
-                    saveTasks();
-                    return ui.formatTaskMarked(tasks.get(markIndex));
+                    return markTask(command);
                 case UNMARK:
-                    int unmarkIndex = Parser.parseTaskIndex(command);
-                    tasks.unmark(unmarkIndex);
-                    saveTasks();
-                    return ui.formatTaskUnmarked(tasks.get(unmarkIndex));
+                    return unmarkTask(command);
                 case DELETE:
-                    Task removedTask = tasks.delete(Parser.parseTaskIndex(command));
-                    saveTasks();
-                    return ui.formatTaskDeleted(removedTask, tasks.size());
+                    return deleteTask(command);
                 case TODO:
                     return addTask(Parser.parseTodo(command));
                 case DEADLINE:
@@ -120,6 +112,31 @@ public class ErmActually {
             commandType = Parser.CommandType.UNKNOWN;
             return ui.formatError("That task number does not exist.");
         }
+    }
+
+    /** Marks and saves the requested task, then formats its confirmation. */
+    private String markTask(String command) throws ErmActuallyException {
+        int taskIndex = Parser.parseTaskIndex(command);
+        tasks.mark(taskIndex);
+        assert tasks.get(taskIndex).isDone() : "A marked task must be complete";
+        saveTasks();
+        return ui.formatTaskMarked(tasks.get(taskIndex));
+    }
+
+    /** Unmarks and saves the requested task, then formats its confirmation. */
+    private String unmarkTask(String command) throws ErmActuallyException {
+        int taskIndex = Parser.parseTaskIndex(command);
+        tasks.unmark(taskIndex);
+        assert !tasks.get(taskIndex).isDone() : "An unmarked task must be incomplete";
+        saveTasks();
+        return ui.formatTaskUnmarked(tasks.get(taskIndex));
+    }
+
+    /** Deletes and saves the requested task, then formats its confirmation. */
+    private String deleteTask(String command) throws ErmActuallyException {
+        Task removedTask = tasks.delete(Parser.parseTaskIndex(command));
+        saveTasks();
+        return ui.formatTaskDeleted(removedTask, tasks.size());
     }
 
     /** Returns an error encountered while loading tasks, or {@code null} if loading succeeded. */
