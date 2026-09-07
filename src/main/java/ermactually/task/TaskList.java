@@ -22,11 +22,14 @@ public class TaskList implements Iterable<Task> {
      * @param tasks Initial tasks, typically loaded from storage.
      */
     public TaskList(ArrayList<Task> tasks) {
+        assert tasks != null : "The initial task collection must exist";
+        assert !tasks.contains(null) : "The initial task collection must not contain null";
         this.tasks = new ArrayList<>(tasks);
     }
 
     /** Adds a task to the end of the list. */
     public void add(Task task) {
+        assert task != null : "A task list must not contain null";
         tasks.add(task);
     }
 
