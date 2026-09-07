@@ -1,5 +1,7 @@
 package ermactually.task;
 
+import java.time.LocalDate;
+
 /**
  * Represents a task the user can complete or leave unfinished.
  */
@@ -58,6 +60,17 @@ public class Task {
      */
     public String getDescription() {
         return description;
+    }
+
+    /**
+     * Returns whether this task occurs on the requested date.
+     * Tasks without a date do not occur on any date.
+     *
+     * @param date Date to check.
+     * @return {@code true} when this task occurs on the requested date.
+     */
+    public boolean occursOn(LocalDate date) {
+        return false;
     }
 
     /**

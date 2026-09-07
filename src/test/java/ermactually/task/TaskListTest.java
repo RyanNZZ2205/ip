@@ -2,6 +2,7 @@ package ermactually.task;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,5 +37,17 @@ public class TaskListTest {
         TaskList tasks = new TaskList(new ArrayList<>(List.of(new Todo("buy groceries"))));
 
         assertEquals(List.of(), tasks.findIndexes("book"));
+    }
+
+    @Test
+    public void findIndexesOn_tasksWithDifferentDateBehavior_returnsMatchingIndexes()
+            throws ErmActuallyException {
+        TaskList tasks = new TaskList(new ArrayList<>(List.of(
+                new Todo("read book"),
+                new Deadline("submit report", "2026-08-25"),
+                new Event("conference", "2026-08-24", "2026-08-26"),
+                new Deadline("return book", "2026-08-26"))));
+
+        assertEquals(List.of(1, 2), tasks.findIndexesOn(LocalDate.of(2026, 8, 25)));
     }
 }
