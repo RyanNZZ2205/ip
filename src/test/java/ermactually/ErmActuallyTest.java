@@ -27,6 +27,19 @@ public class ErmActuallyTest {
     }
 
     @Test
+    public void getWelcomeMessage_returnsBannerAndGreeting() {
+        ErmActually ermActually = createErmActually();
+
+        String welcomeMessage = ermActually.getWelcomeMessage();
+
+        assertEquals("+----------------+\n"
+                + "|  Erm Actually  |\n"
+                + "+----------------+\n"
+                + "Greetings! I'm Erm Actually.\n"
+                + "What can I actually do for you?", welcomeMessage);
+    }
+
+    @Test
     public void getResponse_markTask_updatesTaskAndCommandType() {
         ErmActually ermActually = createErmActually();
         ermActually.getResponse("todo borrow book");

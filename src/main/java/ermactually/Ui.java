@@ -21,12 +21,16 @@ public class Ui {
 
     /** Displays the chatbot banner and greeting. */
     public void showWelcome() {
-        String banner = "+----------------+\n"
+        showMessage(formatWelcome());
+    }
+
+    /** Formats the chatbot banner and greeting. */
+    String formatWelcome() {
+        return "+----------------+\n"
                 + "|  Erm Actually  |\n"
-                + "+----------------+";
-        String welcome = "Greetings! I'm Erm Actually.\n"
+                + "+----------------+\n"
+                + "Greetings! I'm Erm Actually.\n"
                 + "What can I actually do for you?";
-        showMessage(banner + "\n" + welcome);
     }
 
     /** Returns whether another command is available from standard input. */

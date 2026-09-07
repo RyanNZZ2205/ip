@@ -127,6 +127,11 @@ public class ErmActually {
         return startupError;
     }
 
+    /** Returns the welcome message shared by the console and graphical interfaces. */
+    public String getWelcomeMessage() {
+        return ui.formatWelcome();
+    }
+
     /** Returns the type of the most recently processed command. */
     public Parser.CommandType getCommandType() {
         return commandType;
