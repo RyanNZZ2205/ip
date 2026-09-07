@@ -69,6 +69,8 @@ public class Ui {
         StringBuilder response = new StringBuilder(" Here are the matching tasks in your list:");
         ArrayList<Integer> matchingIndexes = tasks.findIndexes(keyword);
         for (int index : matchingIndexes) {
+            assert index >= 0 && index < tasks.size()
+                    : "Task searches must return valid indexes";
             response.append("\n ")
                     .append(index + 1)
                     .append(". ")
@@ -87,6 +89,8 @@ public class Ui {
                 .append(":");
         ArrayList<Integer> matchingIndexes = tasks.findIndexesOn(requestedDate);
         for (int index : matchingIndexes) {
+            assert index >= 0 && index < tasks.size()
+                    : "Date searches must return valid indexes";
             response.append("\n ")
                     .append(index + 1)
                     .append(". ")

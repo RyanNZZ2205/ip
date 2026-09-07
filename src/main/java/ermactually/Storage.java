@@ -146,6 +146,7 @@ public class Storage {
             return joinSavedFields("E", isDone, event.getDescription(),
                     event.getFromStorageString(), event.getToStorageString());
         }
+        assert task instanceof Todo : "Storage only supports todo, deadline, and event tasks";
         return joinSavedFields("T", isDone, task.getDescription());
     }
 
