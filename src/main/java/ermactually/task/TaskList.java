@@ -94,11 +94,7 @@ public class TaskList implements Iterable<Task> {
         ArrayList<Integer> indexes = new ArrayList<>();
         for (int i = 0; i < tasks.size(); i++) {
             Task task = tasks.get(i);
-            boolean occursOnDate = task instanceof Deadline
-                    && ((Deadline) task).occursOn(date);
-            occursOnDate = occursOnDate || task instanceof Event
-                    && ((Event) task).occursOn(date);
-            if (occursOnDate) {
+            if (task.occursOn(date)) {
                 indexes.add(i);
             }
         }
