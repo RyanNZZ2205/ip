@@ -4,6 +4,8 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Locale;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 /**
  * Owns the application's task collection and its task-list operations.
@@ -74,14 +76,12 @@ public class TaskList implements Iterable<Task> {
      */
     public ArrayList<Integer> findIndexes(String keyword) {
         String normalizedKeyword = keyword.toLowerCase(Locale.ROOT);
-        ArrayList<Integer> indexes = new ArrayList<>();
-        for (int i = 0; i < tasks.size(); i++) {
-            String normalizedDescription = tasks.get(i).getDescription().toLowerCase(Locale.ROOT);
-            if (normalizedDescription.contains(normalizedKeyword)) {
-                indexes.add(i);
-            }
-        }
-        return indexes;
+        return IntStream.range(0, tasks.size())
+                .filter(index -> tasks.get(index).getDescription()
+                        .toLowerCase(Locale.ROOT)
+                        .contains(normalizedKeyword))
+                .boxed()
+                .collect(Collectors.toCollection(ArrayList::new));
     }
 
     /**
@@ -91,18 +91,16 @@ public class TaskList implements Iterable<Task> {
      * @return Matching indexes in task-list order.
      */
     public ArrayList<Integer> findIndexesOn(LocalDate date) {
-        ArrayList<Integer> indexes = new ArrayList<>();
-        for (int i = 0; i < tasks.size(); i++) {
-            Task task = tasks.get(i);
-            boolean occursOnDate = task instanceof Deadline
-                    && ((Deadline) task).occursOn(date);
-            occursOnDate = occursOnDate || task instanceof Event
-                    && ((Event) task).occursOn(date);
-            if (occursOnDate) {
-                indexes.add(i);
-            }
-        }
-        return indexes;
+        return IntStream.range(0, tasks.size())
+                .filter(index -> {
+                    Task task = tasks.get(index);
+                    return task instanceof Deadline
+                            && ((Deadline) task).occursOn(date)
+                            || task instanceof Event
+                            && ((Event) task).occursOn(date);
+                })
+                .boxed()
+                .collect(Collectors.toCollection(ArrayList::new));
     }
 
     /** Allows collaborators such as Storage to process each task without exposing the list. */
