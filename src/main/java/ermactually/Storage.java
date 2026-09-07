@@ -7,6 +7,8 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import ermactually.task.Deadline;
 import ermactually.task.Event;
@@ -153,14 +155,13 @@ public class Storage {
 
     /** Encodes task details and joins all fields into one save-file line. */
     private String joinSavedFields(String type, String status, String... details) {
-        ArrayList<String> fields = new ArrayList<>();
-        fields.add(SAVE_FORMAT_VERSION);
-        fields.add(type);
-        fields.add(status);
-        for (String detail : details) {
-            fields.add(Base64.getEncoder().encodeToString(detail.getBytes(StandardCharsets.UTF_8)));
-        }
-        return String.join(FIELD_SEPARATOR, fields);
+        Stream<String> fixedFields = Stream.of(SAVE_FORMAT_VERSION, type, status);
+        Stream<String> encodedDetails = Arrays.stream(details)
+                .map(detail -> Base64.getEncoder().encodeToString(
+                        detail.getBytes(StandardCharsets.UTF_8)));
+
+        return Stream.concat(fixedFields, encodedDetails)
+                .collect(Collectors.joining(FIELD_SEPARATOR));
     }
 
     /** Creates the consistent exception used for malformed saved data. */
