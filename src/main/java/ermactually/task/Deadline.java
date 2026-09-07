@@ -1,10 +1,7 @@
 package ermactually.task;
 
 import java.time.LocalDate;
-import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.util.Locale;
 
 import ermactually.ErmActuallyException;
 
@@ -12,15 +9,7 @@ import ermactually.ErmActuallyException;
  * Represents a task that has a deadline.
  */
 public class Deadline extends Task {
-    private static final DateTimeFormatter DISPLAY_FORMAT =
-            DateTimeFormatter.ofPattern("MMM dd yyyy", Locale.ENGLISH);
-    private static final DateTimeFormatter TIME_INPUT_FORMAT =
-            DateTimeFormatter.ofPattern("HHmm");
-    private static final DateTimeFormatter TIME_DISPLAY_FORMAT =
-            DateTimeFormatter.ofPattern("h:mm a", Locale.ENGLISH);
-
-    protected LocalDate byDate;
-    protected LocalTime byTime;
+    private final TaskDateTime deadlineDateTime;
 
     /**
      * Creates a deadline with a description and deadline value.
@@ -31,9 +20,7 @@ public class Deadline extends Task {
      */
     public Deadline(String description, String by) throws ErmActuallyException {
         super(validateDescription(description), TaskType.DEADLINE);
-        String[] dateAndTime = splitDateAndOptionalTime(by);
-        this.byDate = parseDate(dateAndTime[0]);
-        this.byTime = dateAndTime.length == 2 ? parseTime(dateAndTime[1]) : null;
+        this.deadlineDateTime = parseDateAndOptionalTime(by);
     }
 
     /**
@@ -51,44 +38,18 @@ public class Deadline extends Task {
     }
 
     /**
-     * Splits a deadline into its required date and optional time components.
+     * Parses a deadline into its required date and optional time components.
      *
      * @param by Deadline text entered by the user or read from storage.
-     * @return One element for a date-only deadline, or two elements when a time is present.
-     * @throws ErmActuallyException If the deadline is {@code null} or blank.
+     * @return Parsed deadline date and optional time.
+     * @throws ErmActuallyException If the deadline is empty or has an unsupported format.
      */
-    private static String[] splitDateAndOptionalTime(String by) throws ErmActuallyException {
+    private static TaskDateTime parseDateAndOptionalTime(String by) throws ErmActuallyException {
         if (by == null || by.trim().isEmpty()) {
             throw new ErmActuallyException("The deadline cannot be empty.");
         }
-        return by.trim().split("[T\\s]+", 2);
-    }
-
-    /**
-     * Parses the date component of a deadline.
-     *
-     * @param date Deadline date in {@code yyyy-MM-dd} format.
-     * @return The parsed date.
-     * @throws ErmActuallyException If the date is invalid.
-     */
-    private static LocalDate parseDate(String date) throws ErmActuallyException {
         try {
-            return LocalDate.parse(date);
-        } catch (DateTimeParseException e) {
-            throw invalidDeadlineFormat();
-        }
-    }
-
-    /**
-     * Parses the optional time component from user input or ISO-formatted saved data.
-     *
-     * @param time Deadline time in {@code HHmm} or stored {@code HH:mm} format.
-     * @return The parsed time.
-     * @throws ErmActuallyException If the time is invalid.
-     */
-    private static LocalTime parseTime(String time) throws ErmActuallyException {
-        try {
-            return time.contains(":") ? LocalTime.parse(time) : LocalTime.parse(time, TIME_INPUT_FORMAT);
+            return TaskDateTime.parse(by);
         } catch (DateTimeParseException e) {
             throw invalidDeadlineFormat();
         }
@@ -112,7 +73,7 @@ public class Deadline extends Task {
      */
     @Override
     public boolean occursOn(LocalDate date) {
-        return byDate.equals(date);
+        return deadlineDateTime.isOn(date);
     }
 
     /**
@@ -121,7 +82,7 @@ public class Deadline extends Task {
      * @return A date, optionally followed by an ISO time separated by {@code T}.
      */
     public String toStorageString() {
-        return byTime == null ? byDate.toString() : byDate + "T" + byTime;
+        return deadlineDateTime.toStorageString();
     }
 
     /**
@@ -131,10 +92,6 @@ public class Deadline extends Task {
      */
     @Override
     public String toString() {
-        String formattedDeadline = byDate.format(DISPLAY_FORMAT);
-        if (byTime != null) {
-            formattedDeadline += " " + byTime.format(TIME_DISPLAY_FORMAT);
-        }
-        return super.toString() + " (by: " + formattedDeadline + ")";
+        return super.toString() + " (by: " + deadlineDateTime.toDisplayString() + ")";
     }
 }
