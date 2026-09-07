@@ -21,12 +21,16 @@ public class Ui {
 
     /** Displays the chatbot banner and greeting. */
     public void showWelcome() {
-        String banner = "+----------------+\n"
+        showMessage(formatWelcome());
+    }
+
+    /** Formats the chatbot banner and greeting. */
+    String formatWelcome() {
+        return "+----------------+\n"
                 + "|  Erm Actually  |\n"
-                + "+----------------+";
-        String welcome = "Greetings! I'm Erm Actually.\n"
+                + "+----------------+\n"
+                + "Greetings! I'm Erm Actually.\n"
                 + "What can I actually do for you?";
-        showMessage(banner + "\n" + welcome);
     }
 
     /** Returns whether another command is available from standard input. */
@@ -65,6 +69,8 @@ public class Ui {
         StringBuilder response = new StringBuilder(" Here are the matching tasks in your list:");
         ArrayList<Integer> matchingIndexes = tasks.findIndexes(keyword);
         for (int index : matchingIndexes) {
+            assert index >= 0 && index < tasks.size()
+                    : "Task searches must return valid indexes";
             response.append("\n ")
                     .append(index + 1)
                     .append(". ")
@@ -83,6 +89,8 @@ public class Ui {
                 .append(":");
         ArrayList<Integer> matchingIndexes = tasks.findIndexesOn(requestedDate);
         for (int index : matchingIndexes) {
+            assert index >= 0 && index < tasks.size()
+                    : "Date searches must return valid indexes";
             response.append("\n ")
                     .append(index + 1)
                     .append(". ")

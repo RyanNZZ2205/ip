@@ -45,6 +45,7 @@ public class Event extends Task {
                 && toTime.isBefore(fromTime)) {
             throw new ErmActuallyException("The event end cannot be before its start.");
         }
+        assert !toDate.isBefore(fromDate) : "An event's end date must not precede its start date";
     }
 
     /**

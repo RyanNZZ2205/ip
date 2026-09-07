@@ -60,7 +60,10 @@ public class ErmActually {
      * @param task Parsed task to add.
      */
     private String addTask(Task task) throws ErmActuallyException {
+        int originalTaskCount = tasks.size();
         tasks.add(task);
+        assert tasks.size() == originalTaskCount + 1
+                : "Adding a task must increase the task count by one";
         saveTasks();
         return ui.formatTaskAdded(task, tasks.size());
     }
@@ -93,11 +96,15 @@ public class ErmActually {
                 case MARK:
                     int markIndex = Parser.parseTaskIndex(command);
                     tasks.mark(markIndex);
+                    assert tasks.get(markIndex).isDone()
+                            : "A marked task must be complete";
                     saveTasks();
                     return ui.formatTaskMarked(tasks.get(markIndex));
                 case UNMARK:
                     int unmarkIndex = Parser.parseTaskIndex(command);
                     tasks.unmark(unmarkIndex);
+                    assert !tasks.get(unmarkIndex).isDone()
+                            : "An unmarked task must be incomplete";
                     saveTasks();
                     return ui.formatTaskUnmarked(tasks.get(unmarkIndex));
                 case DELETE:
@@ -125,6 +132,11 @@ public class ErmActually {
     /** Returns an error encountered while loading tasks, or {@code null} if loading succeeded. */
     public String getStartupError() {
         return startupError;
+    }
+
+    /** Returns the welcome message shared by the console and graphical interfaces. */
+    public String getWelcomeMessage() {
+        return ui.formatWelcome();
     }
 
     /** Returns the type of the most recently processed command. */
