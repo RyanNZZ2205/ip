@@ -1,9 +1,11 @@
 package ermactually.task;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Locale;
+import java.util.Optional;
 
 /**
  * Owns the application's task collection and its task-list operations.
@@ -69,6 +71,21 @@ public class TaskList implements Iterable<Task> {
     }
 
     /**
+     * Creates a stably sorted copy using each task's relevant date and time.
+     * Dated tasks precede todos, and date-only tasks precede timed tasks on the same date.
+     *
+     * @param direction Direction used for date and time comparisons.
+     * @return A sorted task list without changing this task list.
+     */
+    public TaskList createChronologicallySorted(SortDirection direction) {
+        assert direction != null : "A sort direction must be provided";
+        ArrayList<Task> sortedTasks = new ArrayList<>(tasks);
+        sortedTasks.sort((firstTask, secondTask) -> compareChronologically(
+                firstTask, secondTask, direction));
+        return new TaskList(sortedTasks);
+    }
+
+    /**
      * Finds the original zero-based indexes of tasks whose descriptions contain a keyword.
      * Matching is case-insensitive and preserves task-list order.
      *
@@ -112,5 +129,41 @@ public class TaskList implements Iterable<Task> {
     @Override
     public Iterator<Task> iterator() {
         return new ArrayList<>(tasks).iterator();
+    }
+
+    /** Compares two tasks while keeping todos and missing times in their fixed groups. */
+    private static int compareChronologically(Task firstTask, Task secondTask,
+            SortDirection direction) {
+        Optional<LocalDate> firstDate = firstTask.getRelevantDate();
+        Optional<LocalDate> secondDate = secondTask.getRelevantDate();
+        if (firstDate.isEmpty() || secondDate.isEmpty()) {
+            return compareOptionalPresence(firstDate.isPresent(), secondDate.isPresent(), true);
+        }
+
+        int dateComparison = firstDate.get().compareTo(secondDate.get());
+        if (dateComparison != 0) {
+            return applyDirection(dateComparison, direction);
+        }
+
+        Optional<LocalTime> firstTime = firstTask.getRelevantTime();
+        Optional<LocalTime> secondTime = secondTask.getRelevantTime();
+        if (firstTime.isEmpty() || secondTime.isEmpty()) {
+            return compareOptionalPresence(firstTime.isPresent(), secondTime.isPresent(), false);
+        }
+        return applyDirection(firstTime.get().compareTo(secondTime.get()), direction);
+    }
+
+    /** Orders optional values using a fixed presence rule without applying the sort direction. */
+    private static int compareOptionalPresence(boolean isFirstPresent, boolean isSecondPresent,
+            boolean isPresentFirst) {
+        if (isFirstPresent == isSecondPresent) {
+            return 0;
+        }
+        return isFirstPresent == isPresentFirst ? -1 : 1;
+    }
+
+    /** Reverses a chronological comparison only when descending order was requested. */
+    private static int applyDirection(int comparison, SortDirection direction) {
+        return direction == SortDirection.ASCENDING ? comparison : -comparison;
     }
 }

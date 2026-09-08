@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Scanner;
 
+import ermactually.task.SortDirection;
 import ermactually.task.Task;
 import ermactually.task.TaskList;
 
@@ -62,6 +63,27 @@ public class Ui {
             }
         }
         return response.toString();
+    }
+
+    /** Formats every task after a successful chronological sort. */
+    String formatSortedTaskList(TaskList tasks, SortDirection direction) {
+        assert !tasks.isEmpty() : "An empty sort uses its dedicated response";
+        String directionName = direction == SortDirection.ASCENDING ? "ascending" : "descending";
+        StringBuilder response = new StringBuilder(" Here are the tasks in your list, sorted in ")
+                .append(directionName)
+                .append(" order:");
+        for (int i = 0; i < tasks.size(); i++) {
+            response.append("\n ")
+                    .append(i + 1)
+                    .append(". ")
+                    .append(tasks.get(i));
+        }
+        return response.toString();
+    }
+
+    /** Formats the successful response for sorting an empty task list. */
+    String formatNoTasksToSort() {
+        return " No tasks to sort.";
     }
 
     /** Formats tasks whose descriptions contain the requested keyword. */

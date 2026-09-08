@@ -2,6 +2,7 @@ package ermactually;
 
 import java.nio.file.Path;
 
+import ermactually.task.SortDirection;
 import ermactually.task.Task;
 import ermactually.task.TaskList;
 
@@ -21,8 +22,18 @@ public class ErmActually {
      * @param filePath Path of the file used to store tasks.
      */
     public ErmActually(String filePath) {
+        this(new Storage(Path.of(filePath)));
+    }
+
+    /**
+     * Creates the application with supplied storage for deterministic integration testing.
+     *
+     * @param storage Storage used to load and save tasks.
+     */
+    ErmActually(Storage storage) {
+        assert storage != null : "Application storage must exist";
         this.ui = new Ui();
-        this.storage = new Storage(Path.of(filePath));
+        this.storage = storage;
         this.tasks = new TaskList();
         loadTasks();
     }
@@ -117,6 +128,15 @@ public class ErmActually {
                     return addTask(Parser.parseDeadline(command));
                 case EVENT:
                     return addTask(Parser.parseEvent(command));
+                case SORT:
+                    SortDirection direction = Parser.parseSortDirection(command);
+                    if (tasks.isEmpty()) {
+                        return ui.formatNoTasksToSort();
+                    }
+                    TaskList sortedTasks = tasks.createChronologicallySorted(direction);
+                    storage.save(sortedTasks);
+                    tasks = sortedTasks;
+                    return ui.formatSortedTaskList(tasks, direction);
                 default:
                     return ui.formatError("actually.. what are you saying??");
             }

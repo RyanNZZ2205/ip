@@ -1,5 +1,9 @@
 package ermactually.task;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.Optional;
+
 /**
  * Represents a task the user can complete or leave unfinished.
  */
@@ -58,6 +62,24 @@ public class Task {
      */
     public String getDescription() {
         return description;
+    }
+
+    /**
+     * Returns the date used to place this task chronologically.
+     *
+     * @return Relevant date, or an empty value for an undated task.
+     */
+    public Optional<LocalDate> getRelevantDate() {
+        return Optional.empty();
+    }
+
+    /**
+     * Returns the optional time used after comparing this task's relevant date.
+     *
+     * @return Relevant time, or an empty value when no time was supplied.
+     */
+    public Optional<LocalTime> getRelevantTime() {
+        return Optional.empty();
     }
 
     /**

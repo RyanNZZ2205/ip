@@ -5,6 +5,7 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.Locale;
+import java.util.Optional;
 
 import ermactually.ErmActuallyException;
 
@@ -115,6 +116,18 @@ public class Event extends Task {
      */
     public boolean occursOn(LocalDate date) {
         return !date.isBefore(fromDate) && !date.isAfter(toDate);
+    }
+
+    /** Returns the event start date used for chronological ordering. */
+    @Override
+    public Optional<LocalDate> getRelevantDate() {
+        return Optional.of(fromDate);
+    }
+
+    /** Returns the event start time when one was supplied. */
+    @Override
+    public Optional<LocalTime> getRelevantTime() {
+        return Optional.ofNullable(fromTime);
     }
 
     /**
