@@ -5,6 +5,7 @@ import java.time.format.DateTimeParseException;
 
 import ermactually.task.Deadline;
 import ermactually.task.Event;
+import ermactually.task.SortDirection;
 import ermactually.task.Todo;
 
 /**
@@ -13,7 +14,7 @@ import ermactually.task.Todo;
 public class Parser {
     /** Commands understood by ErmActually. */
     public enum CommandType {
-        BYE, LIST, FIND, ON, MARK, UNMARK, DELETE, TODO, DEADLINE, EVENT, UNKNOWN
+        BYE, LIST, FIND, ON, MARK, UNMARK, DELETE, TODO, DEADLINE, EVENT, SORT, UNKNOWN
     }
 
     /**
@@ -43,8 +44,29 @@ public class Parser {
             return CommandType.DEADLINE;
         } else if (matchesCommand(command, "event")) {
             return CommandType.EVENT;
+        } else if (matchesSortCommand(command)) {
+            return CommandType.SORT;
         }
         return CommandType.UNKNOWN;
+    }
+
+    /**
+     * Parses the optional direction supplied to a {@code sort} command.
+     *
+     * @param command Complete sort command.
+     * @return Requested direction, defaulting to ascending.
+     * @throws ErmActuallyException If the direction is unsupported or extra arguments are present.
+     */
+    public static SortDirection parseSortDirection(String command) throws ErmActuallyException {
+        assert getCommandType(command) == CommandType.SORT
+                : "parseSortDirection must receive a sort command";
+        String direction = command.substring("sort".length()).trim();
+        if (direction.isEmpty() || direction.equals("asc")) {
+            return SortDirection.ASCENDING;
+        } else if (direction.equals("desc")) {
+            return SortDirection.DESCENDING;
+        }
+        throw new ErmActuallyException("Please use: sort [asc|desc].");
     }
 
     /**
@@ -161,5 +183,12 @@ public class Parser {
     /** Returns whether the input is a keyword alone or followed by arguments. */
     private static boolean matchesCommand(String command, String keyword) {
         return command.equals(keyword) || command.startsWith(keyword + " ");
+    }
+
+    /** Returns whether the input is {@code sort} alone or followed by spaces or tabs. */
+    private static boolean matchesSortCommand(String command) {
+        return command.equals("sort")
+                || command.startsWith("sort ")
+                || command.startsWith("sort\t");
     }
 }

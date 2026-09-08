@@ -619,3 +619,163 @@ ____________________________________________________________
  uhohhhh... Please provide a valid task number.
 ____________________________________________________________
 ```
+
+## Test case: sort mixed tasks ascending
+
+**Aim:** Verify that the default ascending sort interleaves dated tasks, keeps date-only tasks before timed tasks, places todos last, updates `list`, and saves V2 lines in sorted order.
+
+**Inputs:**
+```text
+sort
+list
+bye
+```
+
+**Command:**
+```powershell
+$testData = '_temp\ui-test-data\16.txt'; New-Item -ItemType Directory -Force (Split-Path $testData) | Out-Null; @('T | 0 | buy milk', 'E | 0 | conference | 2026-09-10T09:00 | 2026-09-10T17:00', 'D | 1 | submit report | 2026-09-09T17:00', 'D | 0 | pay bill | 2026-09-09', 'E | 0 | holiday | 2026-09-09 | 2026-09-09') | Set-Content -LiteralPath $testData; $cliSources = Get-ChildItem src\main\java -Recurse -Filter *.java | Where-Object { $_.Name -notin @('DialogBox.java', 'Launcher.java', 'Main.java', 'MainWindow.java') }; javac -d _temp\ui-test-classes $cliSources.FullName; @('sort', 'list', 'bye') | java -cp _temp\ui-test-classes ermactually.ErmActually $testData; Get-Content -LiteralPath $testData
+```
+
+**Expected output:**
+```text
+____________________________________________________________
++----------------+
+|  Erm Actually  |
++----------------+
+Greetings! I'm Erm Actually.
+What can I actually do for you?
+____________________________________________________________
+____________________________________________________________
+ Here are the tasks in your list, sorted in ascending order:
+ 1. [D][ ] pay bill (by: Sep 09 2026)
+ 2. [E][ ] holiday (from: Sep 09 2026 to: Sep 09 2026)
+ 3. [D][X] submit report (by: Sep 09 2026 5:00 PM)
+ 4. [E][ ] conference (from: Sep 10 2026 9:00 AM to: Sep 10 2026 5:00 PM)
+ 5. [T][ ] buy milk
+____________________________________________________________
+____________________________________________________________
+ Here are the tasks in your list:
+ 1. [D][ ] pay bill (by: Sep 09 2026)
+ 2. [E][ ] holiday (from: Sep 09 2026 to: Sep 09 2026)
+ 3. [D][X] submit report (by: Sep 09 2026 5:00 PM)
+ 4. [E][ ] conference (from: Sep 10 2026 9:00 AM to: Sep 10 2026 5:00 PM)
+ 5. [T][ ] buy milk
+____________________________________________________________
+____________________________________________________________
+Farewell! Hope you stop by again soon!
+____________________________________________________________
+V2 | D | 0 | cGF5IGJpbGw= | MjAyNi0wOS0wOQ==
+V2 | E | 0 | aG9saWRheQ== | MjAyNi0wOS0wOQ== | MjAyNi0wOS0wOQ==
+V2 | D | 1 | c3VibWl0IHJlcG9ydA== | MjAyNi0wOS0wOVQxNzowMA==
+V2 | E | 0 | Y29uZmVyZW5jZQ== | MjAyNi0wOS0xMFQwOTowMA== | MjAyNi0wOS0xMFQxNzowMA==
+V2 | T | 0 | YnV5IG1pbGs=
+```
+
+## Test case: sort mixed tasks descending
+
+**Aim:** Verify that descending sort reverses dates and timed values while keeping date-only tasks before timed tasks and todos last.
+
+**Inputs:**
+```text
+sort desc
+bye
+```
+
+**Command:**
+```powershell
+$testData = '_temp\ui-test-data\17.txt'; New-Item -ItemType Directory -Force (Split-Path $testData) | Out-Null; @('T | 0 | buy milk', 'E | 0 | conference | 2026-09-10T09:00 | 2026-09-10T17:00', 'D | 1 | submit report | 2026-09-09T17:00', 'D | 0 | pay bill | 2026-09-09', 'E | 0 | holiday | 2026-09-09 | 2026-09-09') | Set-Content -LiteralPath $testData; $cliSources = Get-ChildItem src\main\java -Recurse -Filter *.java | Where-Object { $_.Name -notin @('DialogBox.java', 'Launcher.java', 'Main.java', 'MainWindow.java') }; javac -d _temp\ui-test-classes $cliSources.FullName; @('sort desc', 'bye') | java -cp _temp\ui-test-classes ermactually.ErmActually $testData
+```
+
+**Expected output:**
+```text
+____________________________________________________________
++----------------+
+|  Erm Actually  |
++----------------+
+Greetings! I'm Erm Actually.
+What can I actually do for you?
+____________________________________________________________
+____________________________________________________________
+ Here are the tasks in your list, sorted in descending order:
+ 1. [E][ ] conference (from: Sep 10 2026 9:00 AM to: Sep 10 2026 5:00 PM)
+ 2. [D][ ] pay bill (by: Sep 09 2026)
+ 3. [E][ ] holiday (from: Sep 09 2026 to: Sep 09 2026)
+ 4. [D][X] submit report (by: Sep 09 2026 5:00 PM)
+ 5. [T][ ] buy milk
+____________________________________________________________
+____________________________________________________________
+Farewell! Hope you stop by again soon!
+____________________________________________________________
+```
+
+## Test case: sort an empty list
+
+**Aim:** Verify that sorting an empty list returns its dedicated successful response without creating a save file.
+
+**Inputs:**
+```text
+sort
+bye
+```
+
+**Command:**
+```powershell
+$testData = '_temp\ui-test-data\18.txt'; if (Test-Path -LiteralPath $testData) { Remove-Item -LiteralPath $testData -Force }; $cliSources = Get-ChildItem src\main\java -Recurse -Filter *.java | Where-Object { $_.Name -notin @('DialogBox.java', 'Launcher.java', 'Main.java', 'MainWindow.java') }; javac -d _temp\ui-test-classes $cliSources.FullName; @('sort', 'bye') | java -cp _temp\ui-test-classes ermactually.ErmActually $testData
+```
+
+**Expected output:**
+```text
+____________________________________________________________
++----------------+
+|  Erm Actually  |
++----------------+
+Greetings! I'm Erm Actually.
+What can I actually do for you?
+____________________________________________________________
+____________________________________________________________
+ No tasks to sort.
+____________________________________________________________
+____________________________________________________________
+Farewell! Hope you stop by again soon!
+____________________________________________________________
+```
+
+## Test case: reject invalid sort syntax
+
+**Aim:** Verify that extra sort arguments return the usage error without changing the in-memory order or legacy save file.
+
+**Inputs:**
+```text
+sort asc desc
+list
+bye
+```
+
+**Command:**
+```powershell
+$testData = '_temp\ui-test-data\19.txt'; New-Item -ItemType Directory -Force (Split-Path $testData) | Out-Null; @('T | 0 | buy milk', 'D | 0 | submit report | 2026-09-09') | Set-Content -LiteralPath $testData; $cliSources = Get-ChildItem src\main\java -Recurse -Filter *.java | Where-Object { $_.Name -notin @('DialogBox.java', 'Launcher.java', 'Main.java', 'MainWindow.java') }; javac -d _temp\ui-test-classes $cliSources.FullName; @('sort asc desc', 'list', 'bye') | java -cp _temp\ui-test-classes ermactually.ErmActually $testData; Get-Content -LiteralPath $testData
+```
+
+**Expected output:**
+```text
+____________________________________________________________
++----------------+
+|  Erm Actually  |
++----------------+
+Greetings! I'm Erm Actually.
+What can I actually do for you?
+____________________________________________________________
+____________________________________________________________
+ uhohhhh... Please use: sort [asc|desc].
+____________________________________________________________
+____________________________________________________________
+ Here are the tasks in your list:
+ 1. [T][ ] buy milk
+ 2. [D][ ] submit report (by: Sep 09 2026)
+____________________________________________________________
+____________________________________________________________
+Farewell! Hope you stop by again soon!
+____________________________________________________________
+T | 0 | buy milk
+D | 0 | submit report | 2026-09-09
+```

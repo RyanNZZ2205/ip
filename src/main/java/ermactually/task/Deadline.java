@@ -5,6 +5,7 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.Locale;
+import java.util.Optional;
 
 import ermactually.ErmActuallyException;
 
@@ -112,6 +113,18 @@ public class Deadline extends Task {
      */
     public boolean occursOn(LocalDate date) {
         return byDate.equals(date);
+    }
+
+    /** Returns the deadline date used for chronological ordering. */
+    @Override
+    public Optional<LocalDate> getRelevantDate() {
+        return Optional.of(byDate);
+    }
+
+    /** Returns the deadline time when one was supplied. */
+    @Override
+    public Optional<LocalTime> getRelevantTime() {
+        return Optional.ofNullable(byTime);
     }
 
     /**
