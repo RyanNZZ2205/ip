@@ -2,6 +2,7 @@ package ermactually;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
+import java.util.regex.Pattern;
 
 import ermactually.task.Deadline;
 import ermactually.task.Event;
@@ -12,6 +13,10 @@ import ermactually.task.Todo;
  * Recognizes user commands and converts their arguments into application values.
  */
 public class Parser {
+    private static final Pattern DEADLINE_SEPARATOR = Pattern.compile("(?:^|\\s+)/by(?=\\s|$)");
+    private static final Pattern EVENT_FROM_SEPARATOR = Pattern.compile("(?:^|\\s+)/from(?=\\s|$)");
+    private static final Pattern EVENT_TO_SEPARATOR = Pattern.compile("(?:^|\\s+)/to(?=\\s|$)");
+
     /** Commands understood by ErmActually. */
     public enum CommandType {
         BYE, LIST, FIND, ON, MARK, UNMARK, DELETE, TODO, DEADLINE, EVENT, SORT, UNKNOWN
@@ -44,7 +49,7 @@ public class Parser {
             return CommandType.DEADLINE;
         } else if (matchesCommand(command, "event")) {
             return CommandType.EVENT;
-        } else if (matchesSortCommand(command)) {
+        } else if (matchesCommand(command, "sort")) {
             return CommandType.SORT;
         }
         return CommandType.UNKNOWN;
@@ -93,8 +98,8 @@ public class Parser {
                 || commandType == CommandType.UNMARK
                 || commandType == CommandType.DELETE
                 : "parseTaskIndex must receive a task-changing command";
-        int firstSpace = command.indexOf(' ');
-        String argument = firstSpace < 0 ? "" : command.substring(firstSpace + 1).trim();
+        int firstWhitespace = findFirstWhitespace(command);
+        String argument = firstWhitespace < 0 ? "" : command.substring(firstWhitespace + 1).trim();
         try {
             int taskNumber = Integer.parseInt(argument);
             if (taskNumber < 1) {
@@ -137,9 +142,9 @@ public class Parser {
         assert getCommandType(command) == CommandType.DEADLINE
                 : "parseDeadline must receive a deadline command";
         String details = command.substring("deadline".length()).trim();
-        String[] parts = details.split(" /by", 2);
+        String[] parts = DEADLINE_SEPARATOR.split(details, -1);
         if (parts.length != 2) {
-            throw new ErmActuallyException("Please add a /by for the deadline.");
+            throw new ErmActuallyException("Please use exactly one /by for the deadline.");
         }
 
         String description = parts[0].trim();
@@ -158,15 +163,15 @@ public class Parser {
         assert getCommandType(command) == CommandType.EVENT
                 : "parseEvent must receive an event command";
         String details = command.substring("event".length()).trim();
-        String[] fromSplit = details.split("/from", 2);
+        String[] fromSplit = EVENT_FROM_SEPARATOR.split(details, -1);
         if (fromSplit.length != 2) {
-            throw new ErmActuallyException("Please add a /from for the event!");
+            throw new ErmActuallyException("Please use exactly one /from for the event.");
         }
 
         String description = fromSplit[0].trim();
-        String[] toSplit = fromSplit[1].split("/to", 2);
+        String[] toSplit = EVENT_TO_SEPARATOR.split(fromSplit[1], -1);
         if (toSplit.length != 2) {
-            throw new ErmActuallyException("Please add a /to and /from for the event!");
+            throw new ErmActuallyException("Please use exactly one /to after /from for the event.");
         }
 
         String from = toSplit[0].trim();
@@ -182,13 +187,19 @@ public class Parser {
 
     /** Returns whether the input is a keyword alone or followed by arguments. */
     private static boolean matchesCommand(String command, String keyword) {
-        return command.equals(keyword) || command.startsWith(keyword + " ");
+        return command.equals(keyword)
+                || command.length() > keyword.length()
+                && command.startsWith(keyword)
+                && Character.isWhitespace(command.charAt(keyword.length()));
     }
 
-    /** Returns whether the input is {@code sort} alone or followed by spaces or tabs. */
-    private static boolean matchesSortCommand(String command) {
-        return command.equals("sort")
-                || command.startsWith("sort ")
-                || command.startsWith("sort\t");
+    /** Returns the position of the first whitespace character, or {@code -1} if absent. */
+    private static int findFirstWhitespace(String value) {
+        for (int i = 0; i < value.length(); i++) {
+            if (Character.isWhitespace(value.charAt(i))) {
+                return i;
+            }
+        }
+        return -1;
     }
 }

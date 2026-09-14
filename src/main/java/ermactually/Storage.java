@@ -2,10 +2,13 @@ package ermactually;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.AtomicMoveNotSupportedException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Base64;
+import java.util.HashSet;
 
 import ermactually.task.Deadline;
 import ermactually.task.Event;
@@ -44,8 +47,13 @@ public class Storage {
             }
 
             ArrayList<Task> tasks = new ArrayList<>();
-            for (String savedTask : Files.readAllLines(filePath)) {
-                tasks.add(createTaskFromSavedLine(savedTask));
+            HashSet<Task> uniqueTasks = new HashSet<>();
+            for (String savedTask : Files.readAllLines(filePath, StandardCharsets.UTF_8)) {
+                Task task = createTaskFromSavedLine(savedTask);
+                if (!uniqueTasks.add(task)) {
+                    throw invalidSavedTask();
+                }
+                tasks.add(task);
             }
             return tasks;
         } catch (IOException | SecurityException | ErmActuallyException e) {
@@ -65,14 +73,37 @@ public class Storage {
             savedTasks.add(formatTaskForSaving(task));
         }
 
+        Path temporaryFile = null;
         try {
-            Path parent = filePath.getParent();
-            if (parent != null) {
-                Files.createDirectories(parent);
+            Path absoluteFilePath = filePath.toAbsolutePath();
+            Path parent = absoluteFilePath.getParent();
+            if (parent == null) {
+                throw new IOException("The task data file has no parent directory.");
             }
-            Files.write(filePath, savedTasks);
+            Files.createDirectories(parent);
+            temporaryFile = Files.createTempFile(parent, ".ermactually-", ".tmp");
+            Files.write(temporaryFile, savedTasks, StandardCharsets.UTF_8);
+            replaceDataFile(temporaryFile, absoluteFilePath);
         } catch (IOException | SecurityException e) {
             throw new ErmActuallyException("I couldn't save your tasks.");
+        } finally {
+            if (temporaryFile != null) {
+                try {
+                    Files.deleteIfExists(temporaryFile);
+                } catch (IOException | SecurityException ignored) {
+                    // The original data remains safe; an abandoned temporary file is harmless.
+                }
+            }
+        }
+    }
+
+    /** Replaces the data file atomically when the file system supports it. */
+    private static void replaceDataFile(Path temporaryFile, Path dataFile) throws IOException {
+        try {
+            Files.move(temporaryFile, dataFile,
+                    StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING);
+        } catch (AtomicMoveNotSupportedException e) {
+            Files.move(temporaryFile, dataFile, StandardCopyOption.REPLACE_EXISTING);
         }
     }
 

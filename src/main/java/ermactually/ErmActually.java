@@ -75,7 +75,12 @@ public class ErmActually {
         tasks.add(task);
         assert tasks.size() == originalTaskCount + 1
                 : "Adding a task must increase the task count by one";
-        saveTasks();
+        try {
+            saveTasks();
+        } catch (ErmActuallyException e) {
+            tasks.delete(tasks.size() - 1);
+            throw e;
+        }
         return ui.formatTaskAdded(task, tasks.size());
     }
 
@@ -91,6 +96,10 @@ public class ErmActually {
      * @return Generated response.
      */
     public String getResponse(String input) {
+        if (input == null) {
+            commandType = Parser.CommandType.UNKNOWN;
+            return ui.formatError("Please enter a command.");
+        }
         String command = input.trim();
         commandType = Parser.getCommandType(command);
 
@@ -106,21 +115,43 @@ public class ErmActually {
                     return ui.formatTasksOnDate(tasks, Parser.parseDate(command));
                 case MARK:
                     int markIndex = Parser.parseTaskIndex(command);
+                    boolean wasMarked = tasks.get(markIndex).isDone();
                     tasks.mark(markIndex);
                     assert tasks.get(markIndex).isDone()
                             : "A marked task must be complete";
-                    saveTasks();
+                    try {
+                        saveTasks();
+                    } catch (ErmActuallyException e) {
+                        if (!wasMarked) {
+                            tasks.unmark(markIndex);
+                        }
+                        throw e;
+                    }
                     return ui.formatTaskMarked(tasks.get(markIndex));
                 case UNMARK:
                     int unmarkIndex = Parser.parseTaskIndex(command);
+                    boolean wasUnmarked = !tasks.get(unmarkIndex).isDone();
                     tasks.unmark(unmarkIndex);
                     assert !tasks.get(unmarkIndex).isDone()
                             : "An unmarked task must be incomplete";
-                    saveTasks();
+                    try {
+                        saveTasks();
+                    } catch (ErmActuallyException e) {
+                        if (!wasUnmarked) {
+                            tasks.mark(unmarkIndex);
+                        }
+                        throw e;
+                    }
                     return ui.formatTaskUnmarked(tasks.get(unmarkIndex));
                 case DELETE:
-                    Task removedTask = tasks.delete(Parser.parseTaskIndex(command));
-                    saveTasks();
+                    int deleteIndex = Parser.parseTaskIndex(command);
+                    Task removedTask = tasks.delete(deleteIndex);
+                    try {
+                        saveTasks();
+                    } catch (ErmActuallyException e) {
+                        tasks.add(deleteIndex, removedTask);
+                        throw e;
+                    }
                     return ui.formatTaskDeleted(removedTask, tasks.size());
                 case TODO:
                     return addTask(Parser.parseTodo(command));

@@ -194,13 +194,13 @@ ____________________________________________________________
 
 **Inputs:**
 ```text
-event holiday /from 2026-08-25 /to 2026-08-25
+event holiday /from 2026-08-25 /to 2026-08-26
 bye
 ```
 
 **Command:**
 ```powershell
-$testData = '_temp\ui-test-data\06.txt'; if (Test-Path -LiteralPath $testData) { Remove-Item -LiteralPath $testData -Force }; $cliSources = Get-ChildItem src\main\java -Recurse -Filter *.java | Where-Object { $_.Name -notin @('DialogBox.java', 'Launcher.java', 'Main.java', 'MainWindow.java') }; javac -d _temp\ui-test-classes $cliSources.FullName; @("event holiday /from 2026-08-25 /to 2026-08-25", "bye") | java -cp _temp\ui-test-classes ermactually.ErmActually $testData; Get-Content -LiteralPath $testData
+$testData = '_temp\ui-test-data\06.txt'; if (Test-Path -LiteralPath $testData) { Remove-Item -LiteralPath $testData -Force }; $cliSources = Get-ChildItem src\main\java -Recurse -Filter *.java | Where-Object { $_.Name -notin @('DialogBox.java', 'Launcher.java', 'Main.java', 'MainWindow.java') }; javac -d _temp\ui-test-classes $cliSources.FullName; @("event holiday /from 2026-08-25 /to 2026-08-26", "bye") | java -cp _temp\ui-test-classes ermactually.ErmActually $testData; Get-Content -LiteralPath $testData
 ```
 
 **Expected output:**
@@ -214,13 +214,13 @@ What can I actually do for you?
 ____________________________________________________________
 ____________________________________________________________
  Alright! I've added this new task:
-   [E][ ] holiday (from: Aug 25 2026 to: Aug 25 2026)
+   [E][ ] holiday (from: Aug 25 2026 to: Aug 26 2026)
  Wow! you have 1 tasks in the list.
 ____________________________________________________________
 ____________________________________________________________
 Farewell! Hope you stop by again soon!
 ____________________________________________________________
-V2 | E | 0 | aG9saWRheQ== | MjAyNi0wOC0yNQ== | MjAyNi0wOC0yNQ==
+V2 | E | 0 | aG9saWRheQ== | MjAyNi0wOC0yNQ== | MjAyNi0wOC0yNg==
 ```
 
 ## Test case: find tasks occurring on a date
@@ -456,7 +456,7 @@ ____________________________________________________________
  uhohhhh... Please add a description for todo!
 ____________________________________________________________
 ____________________________________________________________
- uhohhhh... Please add a /by for the deadline.
+ uhohhhh... Please add a description for deadline!
 ____________________________________________________________
 ____________________________________________________________
  uhohhhh... Please add a deadline using /by.
@@ -465,7 +465,7 @@ ____________________________________________________________
  uhohhhh... Please add a description for this event!
 ____________________________________________________________
 ____________________________________________________________
- uhohhhh... Please add a /to and /from for the event!
+ uhohhhh... Please use exactly one /to after /from for the event.
 ____________________________________________________________
 ____________________________________________________________
  uhohhhh... Event /to and /from details cannot be empty! Please add them in.
@@ -633,7 +633,7 @@ bye
 
 **Command:**
 ```powershell
-$testData = '_temp\ui-test-data\16.txt'; New-Item -ItemType Directory -Force (Split-Path $testData) | Out-Null; @('T | 0 | buy milk', 'E | 0 | conference | 2026-09-10T09:00 | 2026-09-10T17:00', 'D | 1 | submit report | 2026-09-09T17:00', 'D | 0 | pay bill | 2026-09-09', 'E | 0 | holiday | 2026-09-09 | 2026-09-09') | Set-Content -LiteralPath $testData; $cliSources = Get-ChildItem src\main\java -Recurse -Filter *.java | Where-Object { $_.Name -notin @('DialogBox.java', 'Launcher.java', 'Main.java', 'MainWindow.java') }; javac -d _temp\ui-test-classes $cliSources.FullName; @('sort', 'list', 'bye') | java -cp _temp\ui-test-classes ermactually.ErmActually $testData; Get-Content -LiteralPath $testData
+$testData = '_temp\ui-test-data\16.txt'; New-Item -ItemType Directory -Force (Split-Path $testData) | Out-Null; @('T | 0 | buy milk', 'E | 0 | conference | 2026-09-10T09:00 | 2026-09-10T17:00', 'D | 1 | submit report | 2026-09-09T17:00', 'D | 0 | pay bill | 2026-09-09', 'E | 0 | holiday | 2026-09-09 | 2026-09-10') | Set-Content -LiteralPath $testData; $cliSources = Get-ChildItem src\main\java -Recurse -Filter *.java | Where-Object { $_.Name -notin @('DialogBox.java', 'Launcher.java', 'Main.java', 'MainWindow.java') }; javac -d _temp\ui-test-classes $cliSources.FullName; @('sort', 'list', 'bye') | java -cp _temp\ui-test-classes ermactually.ErmActually $testData; Get-Content -LiteralPath $testData
 ```
 
 **Expected output:**
@@ -648,7 +648,7 @@ ____________________________________________________________
 ____________________________________________________________
  Here are the tasks in your list, sorted in ascending order:
  1. [D][ ] pay bill (by: Sep 09 2026)
- 2. [E][ ] holiday (from: Sep 09 2026 to: Sep 09 2026)
+ 2. [E][ ] holiday (from: Sep 09 2026 to: Sep 10 2026)
  3. [D][X] submit report (by: Sep 09 2026 5:00 PM)
  4. [E][ ] conference (from: Sep 10 2026 9:00 AM to: Sep 10 2026 5:00 PM)
  5. [T][ ] buy milk
@@ -656,7 +656,7 @@ ____________________________________________________________
 ____________________________________________________________
  Here are the tasks in your list:
  1. [D][ ] pay bill (by: Sep 09 2026)
- 2. [E][ ] holiday (from: Sep 09 2026 to: Sep 09 2026)
+ 2. [E][ ] holiday (from: Sep 09 2026 to: Sep 10 2026)
  3. [D][X] submit report (by: Sep 09 2026 5:00 PM)
  4. [E][ ] conference (from: Sep 10 2026 9:00 AM to: Sep 10 2026 5:00 PM)
  5. [T][ ] buy milk
@@ -665,7 +665,7 @@ ____________________________________________________________
 Farewell! Hope you stop by again soon!
 ____________________________________________________________
 V2 | D | 0 | cGF5IGJpbGw= | MjAyNi0wOS0wOQ==
-V2 | E | 0 | aG9saWRheQ== | MjAyNi0wOS0wOQ== | MjAyNi0wOS0wOQ==
+V2 | E | 0 | aG9saWRheQ== | MjAyNi0wOS0wOQ== | MjAyNi0wOS0xMA==
 V2 | D | 1 | c3VibWl0IHJlcG9ydA== | MjAyNi0wOS0wOVQxNzowMA==
 V2 | E | 0 | Y29uZmVyZW5jZQ== | MjAyNi0wOS0xMFQwOTowMA== | MjAyNi0wOS0xMFQxNzowMA==
 V2 | T | 0 | YnV5IG1pbGs=
@@ -683,7 +683,7 @@ bye
 
 **Command:**
 ```powershell
-$testData = '_temp\ui-test-data\17.txt'; New-Item -ItemType Directory -Force (Split-Path $testData) | Out-Null; @('T | 0 | buy milk', 'E | 0 | conference | 2026-09-10T09:00 | 2026-09-10T17:00', 'D | 1 | submit report | 2026-09-09T17:00', 'D | 0 | pay bill | 2026-09-09', 'E | 0 | holiday | 2026-09-09 | 2026-09-09') | Set-Content -LiteralPath $testData; $cliSources = Get-ChildItem src\main\java -Recurse -Filter *.java | Where-Object { $_.Name -notin @('DialogBox.java', 'Launcher.java', 'Main.java', 'MainWindow.java') }; javac -d _temp\ui-test-classes $cliSources.FullName; @('sort desc', 'bye') | java -cp _temp\ui-test-classes ermactually.ErmActually $testData
+$testData = '_temp\ui-test-data\17.txt'; New-Item -ItemType Directory -Force (Split-Path $testData) | Out-Null; @('T | 0 | buy milk', 'E | 0 | conference | 2026-09-10T09:00 | 2026-09-10T17:00', 'D | 1 | submit report | 2026-09-09T17:00', 'D | 0 | pay bill | 2026-09-09', 'E | 0 | holiday | 2026-09-09 | 2026-09-10') | Set-Content -LiteralPath $testData; $cliSources = Get-ChildItem src\main\java -Recurse -Filter *.java | Where-Object { $_.Name -notin @('DialogBox.java', 'Launcher.java', 'Main.java', 'MainWindow.java') }; javac -d _temp\ui-test-classes $cliSources.FullName; @('sort desc', 'bye') | java -cp _temp\ui-test-classes ermactually.ErmActually $testData
 ```
 
 **Expected output:**
@@ -699,7 +699,7 @@ ____________________________________________________________
  Here are the tasks in your list, sorted in descending order:
  1. [E][ ] conference (from: Sep 10 2026 9:00 AM to: Sep 10 2026 5:00 PM)
  2. [D][ ] pay bill (by: Sep 09 2026)
- 3. [E][ ] holiday (from: Sep 09 2026 to: Sep 09 2026)
+ 3. [E][ ] holiday (from: Sep 09 2026 to: Sep 10 2026)
  4. [D][X] submit report (by: Sep 09 2026 5:00 PM)
  5. [T][ ] buy milk
 ____________________________________________________________
@@ -778,4 +778,96 @@ Farewell! Hope you stop by again soon!
 ____________________________________________________________
 T | 0 | buy milk
 D | 0 | submit report | 2026-09-09
+```
+
+## Test case: reject malformed and contradictory input
+
+**Aim:** Verify flexible command whitespace, duplicate-task rejection, duplicate parameter rejection,
+invalid event ordering, nonexistent dates, and tab-separated task numbers.
+
+**Inputs:**
+```text
+<tab> todo<tab>borrow book <tab>
+todo   borrow book
+deadline report /by 2026-09-15 /by 2026-09-16
+event meeting /from 2026-09-15 0900 /to 2026-09-15 0900
+event trip /from 2026-02-30 /to 2026-03-01
+mark<tab>1
+bye
+```
+
+**Command:**
+```powershell
+$testData = '_temp\ui-test-data\20.txt'; if (Test-Path -LiteralPath $testData) { Remove-Item -LiteralPath $testData -Force }; $cliSources = Get-ChildItem src\main\java -Recurse -Filter *.java | Where-Object { $_.Name -notin @('DialogBox.java', 'Launcher.java', 'Main.java', 'MainWindow.java') }; javac -d _temp\ui-test-classes $cliSources.FullName; @("`t todo`tborrow book `t", "todo   borrow book", "deadline report /by 2026-09-15 /by 2026-09-16", "event meeting /from 2026-09-15 0900 /to 2026-09-15 0900", "event trip /from 2026-02-30 /to 2026-03-01", "mark`t1", "bye") | java -cp _temp\ui-test-classes ermactually.ErmActually $testData
+```
+
+**Expected output:**
+```text
+____________________________________________________________
++----------------+
+|  Erm Actually  |
++----------------+
+Greetings! I'm Erm Actually.
+What can I actually do for you?
+____________________________________________________________
+____________________________________________________________
+ Alright! I've added this new task:
+   [T][ ] borrow book
+ Wow! you have 1 tasks in the list.
+____________________________________________________________
+____________________________________________________________
+ uhohhhh... That task already exists.
+____________________________________________________________
+____________________________________________________________
+ uhohhhh... Please use exactly one /by for the deadline.
+____________________________________________________________
+____________________________________________________________
+ uhohhhh... The event end must be after its start.
+____________________________________________________________
+____________________________________________________________
+ uhohhhh... Please enter the event start in yyyy-MM-dd or yyyy-MM-dd HHmm format.
+____________________________________________________________
+____________________________________________________________
+oh! good job you've actually finished this task:
+ [T][X] borrow book
+____________________________________________________________
+____________________________________________________________
+Farewell! Hope you stop by again soon!
+____________________________________________________________
+```
+
+## Test case: reject duplicate saved tasks
+
+**Aim:** Verify that duplicate task details in the data file are treated as corrupted data and are not partially loaded.
+
+**Inputs:**
+```text
+list
+bye
+```
+
+**Command:**
+```powershell
+$testData = '_temp\ui-test-data\21.txt'; New-Item -ItemType Directory -Force (Split-Path $testData) | Out-Null; @('T | 0 | borrow book', 'T | 1 | borrow book') | Set-Content -LiteralPath $testData; $cliSources = Get-ChildItem src\main\java -Recurse -Filter *.java | Where-Object { $_.Name -notin @('DialogBox.java', 'Launcher.java', 'Main.java', 'MainWindow.java') }; javac -d _temp\ui-test-classes $cliSources.FullName; @('list', 'bye') | java -cp _temp\ui-test-classes ermactually.ErmActually $testData
+```
+
+**Expected output:**
+```text
+____________________________________________________________
++----------------+
+|  Erm Actually  |
++----------------+
+Greetings! I'm Erm Actually.
+What can I actually do for you?
+____________________________________________________________
+____________________________________________________________
+ uhohhhh... I couldn't load your tasks.
+____________________________________________________________
+____________________________________________________________
+ Here are the tasks in your list:
+Woohoo! No tasks found!
+____________________________________________________________
+____________________________________________________________
+Farewell! Hope you stop by again soon!
+____________________________________________________________
 ```

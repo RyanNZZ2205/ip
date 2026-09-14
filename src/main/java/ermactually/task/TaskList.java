@@ -7,6 +7,8 @@ import java.util.Iterator;
 import java.util.Locale;
 import java.util.Optional;
 
+import ermactually.ErmActuallyException;
+
 /**
  * Owns the application's task collection and its task-list operations.
  */
@@ -29,10 +31,29 @@ public class TaskList implements Iterable<Task> {
         this.tasks = new ArrayList<>(tasks);
     }
 
-    /** Adds a task to the end of the list. */
-    public void add(Task task) {
+    /**
+     * Adds a unique task to the end of the list.
+     *
+     * @param task Task to add.
+     * @throws ErmActuallyException If a task with the same details already exists.
+     */
+    public void add(Task task) throws ErmActuallyException {
         assert task != null : "A task list must not contain null";
+        if (tasks.contains(task)) {
+            throw new ErmActuallyException("That task already exists.");
+        }
         tasks.add(task);
+    }
+
+    /**
+     * Restores a task at a specific position after an operation fails.
+     *
+     * @param index Position at which to restore the task.
+     * @param task Task to restore.
+     */
+    public void add(int index, Task task) {
+        assert task != null : "A task list must not contain null";
+        tasks.add(index, task);
     }
 
     /**

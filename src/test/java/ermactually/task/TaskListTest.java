@@ -2,6 +2,7 @@ package ermactually.task;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,7 +26,7 @@ public class TaskListTest {
                 new Event("conference", "2026-09-10 0900", "2026-09-10 1700"),
                 equalTimedDeadline,
                 new Deadline("pay bill", "2026-09-09"),
-                new Event("holiday", "2026-09-09", "2026-09-09"),
+                new Event("holiday", "2026-09-09", "2026-09-10"),
                 new Event("same-time event", "2026-09-09 1700", "2026-09-12"),
                 new Deadline("morning task", "2026-09-09 0900"),
                 new Todo("call Alex"))));
@@ -106,6 +107,19 @@ public class TaskListTest {
         TaskList tasks = new TaskList(new ArrayList<>(List.of(new Todo("buy groceries"))));
 
         assertEquals(List.of(), tasks.findIndexes("book"));
+    }
+
+    @Test
+    public void add_duplicateTask_exceptionThrownAndListUnchanged() throws ErmActuallyException {
+        TaskList tasks = new TaskList();
+        tasks.add(new Deadline("submit report", "2026-09-15 1700"));
+
+        ErmActuallyException exception = assertThrows(
+                ErmActuallyException.class, () ->
+                        tasks.add(new Deadline("submit report", "2026-09-15T17:00")));
+
+        assertEquals("That task already exists.", exception.getMessage());
+        assertEquals(1, tasks.size());
     }
 
     /** Returns task descriptions in their current list order. */
