@@ -25,7 +25,7 @@ public class Todo extends Task {
      */
     private static String validateDescription(String description) throws ErmActuallyException {
         if (description == null || description.trim().isEmpty()) {
-            throw new ErmActuallyException("The description of a todo cannot be empty.");
+            throw new ErmActuallyException("Please add a description of the todo!");
         }
         return description.trim();
     }

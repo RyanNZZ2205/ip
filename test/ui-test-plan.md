@@ -43,7 +43,7 @@ ____________________________________________________________
  Wow! you have 1 tasks in the list.
 ____________________________________________________________
 ____________________________________________________________
- Here are the tasks in your list:
+ here you go! your task list:
  1. [T][ ] borrow book
 ____________________________________________________________
 ____________________________________________________________
@@ -147,7 +147,7 @@ Greetings! I'm Erm Actually.
 What can I actually do for you?
 ____________________________________________________________
 ____________________________________________________________
- uhohhhh... Please enter the deadline in yyyy-MM-dd or yyyy-MM-dd HHmm format.
+ uhohhhh... the deadline's format is actually in yyyy-MM-dd or yyyy-MM-dd HHmm!
 ____________________________________________________________
 ____________________________________________________________
 Farewell! Hope you stop by again soon!
@@ -329,7 +329,7 @@ ____________________________________________________________
  No matching tasks found.
 ____________________________________________________________
 ____________________________________________________________
- uhohhhh... Please provide a keyword to find.
+ uhohhhh... actually you have to give me a keyword to find!
 ____________________________________________________________
 ____________________________________________________________
 Farewell! Hope you stop by again soon!
@@ -364,7 +364,7 @@ What can I actually do for you?
 ____________________________________________________________
 ____________________________________________________________
  Here are the tasks occurring on 2019-12-03:
- No deadlines or events found.
+ I didn't find any deadlines or events!
 ____________________________________________________________
 ____________________________________________________________
  uhohhhh... Please provide a date in yyyy-MM-dd format.
@@ -424,23 +424,25 @@ V2 | T | 0 | Ym9ycm93IGJvb2s=
 
 ## Test case: reject empty task fields
 
-**Aim:** Verify that empty todo, deadline, and event fields display specific chatbot errors without adding a task.
+**Aim:** Verify that empty fields and missing task delimiters display specific chatbot errors without adding a task.
 
 **Inputs:**
 ```text
 todo
-deadline  /by Friday
+deadline /by 2026-08-25
+deadline submit report
 deadline submit report /by
 event  /from Mon /to Tue
+event meeting /to 2026-08-26
 event meeting /from Mon
 event meeting /from /to 4pm
-event meeting /from 2pm /to
+event meeting /from 2026-08-25 /to
 bye
 ```
 
 **Command:**
 ```powershell
-$testData = '_temp\ui-test-data\11.txt'; if (Test-Path -LiteralPath $testData) { Remove-Item -LiteralPath $testData -Force }; $cliSources = Get-ChildItem src\main\java -Recurse -Filter *.java | Where-Object { $_.Name -notin @('DialogBox.java', 'Launcher.java', 'Main.java', 'MainWindow.java') }; javac -d _temp\ui-test-classes $cliSources.FullName; @("todo", "deadline  /by Friday", "deadline submit report /by", "event  /from Mon /to Tue", "event meeting /from Mon", "event meeting /from /to 4pm", "event meeting /from 2pm /to", "bye") | java -cp _temp\ui-test-classes ermactually.ErmActually $testData
+$testData = '_temp\ui-test-data\11.txt'; if (Test-Path -LiteralPath $testData) { Remove-Item -LiteralPath $testData -Force }; $cliSources = Get-ChildItem src\main\java -Recurse -Filter *.java | Where-Object { $_.Name -notin @('DialogBox.java', 'Launcher.java', 'Main.java', 'MainWindow.java') }; javac -d _temp\ui-test-classes $cliSources.FullName; @("todo", "deadline /by 2026-08-25", "deadline submit report", "deadline submit report /by", "event  /from Mon /to Tue", "event meeting /to 2026-08-26", "event meeting /from Mon", "event meeting /from /to 4pm", "event meeting /from 2026-08-25 /to", "bye") | java -cp _temp\ui-test-classes ermactually.ErmActually $testData
 ```
 
 **Expected output:**
@@ -453,25 +455,31 @@ Greetings! I'm Erm Actually.
 What can I actually do for you?
 ____________________________________________________________
 ____________________________________________________________
- uhohhhh... Please add a description for todo!
+ uhohhhh... Please add a description of the todo!
 ____________________________________________________________
 ____________________________________________________________
- uhohhhh... Please add a /by for the deadline.
+ uhohhhh... please add in a description for the deadline!
 ____________________________________________________________
 ____________________________________________________________
- uhohhhh... Please add a deadline using /by.
+ uhohhhh... please add in a deadline! its actually using /by
 ____________________________________________________________
 ____________________________________________________________
- uhohhhh... Please add a description for this event!
+ uhohhhh... please add in a deadline! its actually using /by
 ____________________________________________________________
 ____________________________________________________________
- uhohhhh... Please add a /to and /from for the event!
+ uhohhhh... Please add in a description of the event!
 ____________________________________________________________
 ____________________________________________________________
- uhohhhh... Event /to and /from details cannot be empty! Please add them in.
+ uhohhhh... please add in a starting date/time! its actually using /from
 ____________________________________________________________
 ____________________________________________________________
- uhohhhh... Event /to and /from details cannot be empty! Please add them in.
+ uhohhhh... please add in an ending date/time! its actually using /to
+____________________________________________________________
+____________________________________________________________
+ uhohhhh... The event start cannot be empty.
+____________________________________________________________
+____________________________________________________________
+ uhohhhh... The event end cannot be empty.
 ____________________________________________________________
 ____________________________________________________________
 Farewell! Hope you stop by again soon!
@@ -503,7 +511,7 @@ Greetings! I'm Erm Actually.
 What can I actually do for you?
 ____________________________________________________________
 ____________________________________________________________
- Here are the tasks in your list:
+ here you go! your task list:
  1. [T][X] borrow book
  2. [D][ ] return book (by: Dec 02 2019)
  3. [E][ ] project meeting (from: Dec 02 2019 2:00 PM to: Dec 02 2019 4:00 PM)
@@ -576,7 +584,7 @@ ____________________________________________________________
  uhohhhh... I couldn't load your tasks.
 ____________________________________________________________
 ____________________________________________________________
- Here are the tasks in your list:
+ here you go! your task list:
 Woohoo! No tasks found!
 ____________________________________________________________
 ____________________________________________________________
@@ -586,18 +594,20 @@ ____________________________________________________________
 
 ## Test case: reject missing task numbers
 
-**Aim:** Verify that task-changing commands without a number display errors and input ending without `bye` exits cleanly.
+**Aim:** Verify that missing and nonexistent task numbers display their specific errors and input ending without `bye`
+exits cleanly.
 
 **Inputs:**
 ```text
 mark
 unmark
 delete
+delete 1
 ```
 
 **Command:**
 ```powershell
-$testData = '_temp\ui-test-data\15.txt'; if (Test-Path -LiteralPath $testData) { Remove-Item -LiteralPath $testData -Force }; $cliSources = Get-ChildItem src\main\java -Recurse -Filter *.java | Where-Object { $_.Name -notin @('DialogBox.java', 'Launcher.java', 'Main.java', 'MainWindow.java') }; javac -d _temp\ui-test-classes $cliSources.FullName; @("mark", "unmark", "delete") | java -cp _temp\ui-test-classes ermactually.ErmActually $testData
+$testData = '_temp\ui-test-data\15.txt'; if (Test-Path -LiteralPath $testData) { Remove-Item -LiteralPath $testData -Force }; $cliSources = Get-ChildItem src\main\java -Recurse -Filter *.java | Where-Object { $_.Name -notin @('DialogBox.java', 'Launcher.java', 'Main.java', 'MainWindow.java') }; javac -d _temp\ui-test-classes $cliSources.FullName; @("mark", "unmark", "delete", "delete 1") | java -cp _temp\ui-test-classes ermactually.ErmActually $testData
 ```
 
 **Expected output:**
@@ -610,13 +620,16 @@ Greetings! I'm Erm Actually.
 What can I actually do for you?
 ____________________________________________________________
 ____________________________________________________________
- uhohhhh... Please provide a valid task number.
+ uhohhhh... actually you need to give me a valid task number!
 ____________________________________________________________
 ____________________________________________________________
- uhohhhh... Please provide a valid task number.
+ uhohhhh... actually you need to give me a valid task number!
 ____________________________________________________________
 ____________________________________________________________
- uhohhhh... Please provide a valid task number.
+ uhohhhh... actually you need to give me a valid task number!
+____________________________________________________________
+____________________________________________________________
+ uhohhhh... actually that task number doesn't exist!
 ____________________________________________________________
 ```
 
@@ -654,7 +667,7 @@ ____________________________________________________________
  5. [T][ ] buy milk
 ____________________________________________________________
 ____________________________________________________________
- Here are the tasks in your list:
+ here you go! your task list:
  1. [D][ ] pay bill (by: Sep 09 2026)
  2. [E][ ] holiday (from: Sep 09 2026 to: Sep 09 2026)
  3. [D][X] submit report (by: Sep 09 2026 5:00 PM)
@@ -733,7 +746,7 @@ Greetings! I'm Erm Actually.
 What can I actually do for you?
 ____________________________________________________________
 ____________________________________________________________
- No tasks to sort.
+ actually, there is nothing to sort!
 ____________________________________________________________
 ____________________________________________________________
 Farewell! Hope you stop by again soon!
@@ -769,7 +782,7 @@ ____________________________________________________________
  uhohhhh... Please use: sort [asc|desc].
 ____________________________________________________________
 ____________________________________________________________
- Here are the tasks in your list:
+ here you go! your task list:
  1. [T][ ] buy milk
  2. [D][ ] submit report (by: Sep 09 2026)
 ____________________________________________________________

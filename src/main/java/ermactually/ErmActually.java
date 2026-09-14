@@ -138,14 +138,14 @@ public class ErmActually {
                     tasks = sortedTasks;
                     return ui.formatSortedTaskList(tasks, direction);
                 default:
-                    return ui.formatError("actually.. what are you saying??");
+                    return ui.formatError("erm actually.. what are you trying to say??");
             }
         } catch (ErmActuallyException e) {
             commandType = Parser.CommandType.UNKNOWN;
             return ui.formatError(e.getMessage());
         } catch (IndexOutOfBoundsException e) {
             commandType = Parser.CommandType.UNKNOWN;
-            return ui.formatError("That task number does not exist.");
+            return ui.formatError("actually that task number doesn't exist!");
         }
     }
 

@@ -16,10 +16,11 @@ import ermactually.ErmActuallyException;
  */
 public class DeadlineTest {
     private static final String BLANK_DESCRIPTION_MESSAGE =
-            "The description of a deadline cannot be empty.";
-    private static final String BLANK_DEADLINE_MESSAGE = "The deadline cannot be empty.";
+            "please add in a description for the deadline!";
+    private static final String BLANK_DEADLINE_MESSAGE =
+            "please add in a deadline! its actually using /by";
     private static final String INVALID_FORMAT_MESSAGE =
-            "Please enter the deadline in yyyy-MM-dd or yyyy-MM-dd HHmm format.";
+            "the deadline's format is actually in yyyy-MM-dd or yyyy-MM-dd HHmm!";
 
     @Test
     public void occursOn_sameDate_returnsTrue() throws ErmActuallyException {

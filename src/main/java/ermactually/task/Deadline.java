@@ -46,7 +46,7 @@ public class Deadline extends Task {
      */
     private static String validateDescription(String description) throws ErmActuallyException {
         if (description == null || description.trim().isEmpty()) {
-            throw new ErmActuallyException("The description of a deadline cannot be empty.");
+            throw new ErmActuallyException("please add in a description for the deadline!");
         }
         return description.trim();
     }
@@ -60,7 +60,7 @@ public class Deadline extends Task {
      */
     private static String[] splitDateAndOptionalTime(String by) throws ErmActuallyException {
         if (by == null || by.trim().isEmpty()) {
-            throw new ErmActuallyException("The deadline cannot be empty.");
+            throw new ErmActuallyException("please add in a deadline! its actually using /by");
         }
         return by.trim().split("[T\\s]+", 2);
     }
@@ -102,7 +102,7 @@ public class Deadline extends Task {
      */
     private static ErmActuallyException invalidDeadlineFormat() {
         return new ErmActuallyException(
-                "Please enter the deadline in yyyy-MM-dd or yyyy-MM-dd HHmm format.");
+                "the deadline's format is actually in yyyy-MM-dd or yyyy-MM-dd HHmm!");
     }
 
     /**

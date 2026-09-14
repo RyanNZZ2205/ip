@@ -44,7 +44,7 @@ public class Event extends Task {
         if (toDate.isBefore(fromDate)
                 || toDate.equals(fromDate) && fromTime != null && toTime != null
                 && toTime.isBefore(fromTime)) {
-            throw new ErmActuallyException("The event end cannot be before its start.");
+            throw new ErmActuallyException("how can the event end before it starts?");
         }
         assert !toDate.isBefore(fromDate) : "An event's end date must not precede its start date";
     }
@@ -58,7 +58,7 @@ public class Event extends Task {
      */
     private static String validateDescription(String description) throws ErmActuallyException {
         if (description == null || description.trim().isEmpty()) {
-            throw new ErmActuallyException("The description of an event cannot be empty.");
+            throw new ErmActuallyException("Please add in a description of the event!");
         }
         return description.trim();
     }
@@ -104,8 +104,8 @@ public class Event extends Task {
      * @return An exception explaining both accepted event formats.
      */
     private static ErmActuallyException invalidEventFormat(String valueName) {
-        return new ErmActuallyException("Please enter the event " + valueName
-                + " in yyyy-MM-dd or yyyy-MM-dd HHmm format.");
+        return new ErmActuallyException("actually the format of " + valueName
+                + " is in yyyy-MM-dd or yyyy-MM-dd HHmm!");
     }
 
     /**
