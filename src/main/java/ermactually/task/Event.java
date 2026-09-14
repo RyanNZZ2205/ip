@@ -5,6 +5,7 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.Optional;
 
 import ermactually.ErmActuallyException;
@@ -31,7 +32,7 @@ public class Event extends Task {
      * @param from Event start in {@code yyyy-MM-dd} or {@code yyyy-MM-dd HHmm} format.
      * @param to Event end in {@code yyyy-MM-dd} or {@code yyyy-MM-dd HHmm} format.
      * @throws ErmActuallyException If a required value is empty, a date-time is invalid, or the end
-     *         is before the start.
+     *         is not after the start.
      */
     public Event(String description, String from, String to) throws ErmActuallyException {
         super(validateDescription(description), TaskType.EVENT);
@@ -41,9 +42,12 @@ public class Event extends Task {
         this.fromTime = parsedFrom.time;
         this.toDate = parsedTo.date;
         this.toTime = parsedTo.time;
+        if (toDate.equals(fromDate) && (fromTime == null) != (toTime == null)) {
+            throw new ErmActuallyException(
+                    "Please provide times for both event endpoints, or for neither endpoint.");
+        }
         if (toDate.isBefore(fromDate)
-                || toDate.equals(fromDate) && fromTime != null && toTime != null
-                && toTime.isBefore(fromTime)) {
+                || toDate.equals(fromDate) && (fromTime == null || !toTime.isAfter(fromTime))) {
             throw new ErmActuallyException("how can the event end before it starts?");
         }
         assert !toDate.isBefore(fromDate) : "An event's end date must not precede its start date";
@@ -146,6 +150,25 @@ public class Event extends Task {
      */
     public String getToStorageString() {
         return formatForStorage(toDate, toTime);
+    }
+
+    /** Returns whether another event has the same description and endpoints. */
+    @Override
+    public boolean equals(Object other) {
+        if (!super.equals(other)) {
+            return false;
+        }
+        Event otherEvent = (Event) other;
+        return fromDate.equals(otherEvent.fromDate)
+                && Objects.equals(fromTime, otherEvent.fromTime)
+                && toDate.equals(otherEvent.toDate)
+                && Objects.equals(toTime, otherEvent.toTime);
+    }
+
+    /** Returns a hash based on the immutable event details. */
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), fromDate, fromTime, toDate, toTime);
     }
 
     /**

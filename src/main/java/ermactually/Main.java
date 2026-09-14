@@ -5,6 +5,7 @@ import java.io.IOException;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 
@@ -13,7 +14,7 @@ import javafx.stage.Stage;
  */
 public class Main extends Application {
 
-    private ErmActually ermActually =
+    private final ErmActually ermActually =
             new ErmActually("data/ErmActually.txt");
 
     /**
@@ -25,15 +26,24 @@ public class Main extends Application {
     public void start(Stage stage) {
         try {
             FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("/view/MainWindow.fxml"));
-            AnchorPane ap = fxmlLoader.load();
-            Scene scene = new Scene(ap);
+            AnchorPane root = fxmlLoader.load();
+            Scene scene = new Scene(root);
             stage.setScene(scene);
             stage.setMinHeight(220);
             stage.setMinWidth(417);
-            fxmlLoader.<MainWindow>getController().setErmActually(ermActually); // inject the ErmActually instance
+            fxmlLoader.<MainWindow>getController().setErmActually(ermActually);
             stage.show();
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (IOException | RuntimeException e) {
+            showStartupError();
         }
+    }
+
+    /** Shows a concise error when required graphical interface resources cannot be loaded. */
+    private static void showStartupError() {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Erm Actually could not start");
+        alert.setHeaderText("The graphical interface could not be loaded.");
+        alert.setContentText("Please reinstall the application or restore its missing resource files.");
+        alert.showAndWait();
     }
 }

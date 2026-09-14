@@ -32,7 +32,7 @@ public class ErmActuallyTest {
 
         String sortResponse = ermActually.getResponse("\t sort\tasc \t");
         String markResponse = ermActually.getResponse("mark 1");
-        ermActually.getResponse("event newly added /from 2026-09-01 /to 2026-09-01");
+        ermActually.getResponse("event newly added /from 2026-09-01 /to 2026-09-02");
 
         assertEquals(" Here are the tasks in your list, sorted in ascending order:\n"
                 + " 1. [D][ ] earlier (by: Sep 09 2026)\n"
@@ -46,7 +46,7 @@ public class ErmActuallyTest {
                 + " 1. [D][X] earlier (by: Sep 09 2026)\n"
                 + " 2. [D][ ] later (by: Sep 10 2026)\n"
                 + " 3. [T][ ] buy milk\n"
-                + " 4. [E][ ] newly added (from: Sep 01 2026 to: Sep 01 2026)",
+                + " 4. [E][ ] newly added (from: Sep 01 2026 to: Sep 02 2026)",
                 restartedApplication.getResponse("list"));
     }
 
@@ -203,6 +203,65 @@ public class ErmActuallyTest {
 
         assertEquals(" uhohhhh... erm actually.. what are you trying to say??",
                 ermActually.getResponse("hello"));
+    }
+
+    @Test
+    public void getResponse_duplicateTask_returnsErrorAndKeepsSingleTask() {
+        ErmActually ermActually = createErmActually();
+        ermActually.getResponse("todo borrow book");
+
+        String response = ermActually.getResponse("todo borrow book");
+
+        assertEquals(" uhohhhh... That task already exists.", response);
+        assertEquals(" here you go! your task list:\n 1. [T][ ] borrow book",
+                ermActually.getResponse("list"));
+    }
+
+    @Test
+    public void getResponse_nullInput_returnsError() {
+        ErmActually ermActually = createErmActually();
+
+        String response = ermActually.getResponse(null);
+
+        assertEquals(" uhohhhh... Please enter a command.", response);
+        assertEquals(Parser.CommandType.UNKNOWN, ermActually.getCommandType());
+    }
+
+    @Test
+    public void getResponse_addSaveFails_rollsBackAddedTask() {
+        ErmActually ermActually = new ErmActually(new FailingStorage(new ArrayList<>()));
+
+        String response = ermActually.getResponse("todo borrow book");
+
+        assertEquals(" uhohhhh... I couldn't save your tasks.", response);
+        assertEquals(" here you go! your task list:\nWoohoo! No tasks found!",
+                ermActually.getResponse("list"));
+    }
+
+    @Test
+    public void getResponse_markSaveFails_rollsBackCompletionState()
+            throws ErmActuallyException {
+        ArrayList<Task> initialTasks = new ArrayList<>(List.of(new Todo("borrow book")));
+        ErmActually ermActually = new ErmActually(new FailingStorage(initialTasks));
+
+        String response = ermActually.getResponse("mark 1");
+
+        assertEquals(" uhohhhh... I couldn't save your tasks.", response);
+        assertEquals(" here you go! your task list:\n 1. [T][ ] borrow book",
+                ermActually.getResponse("list"));
+    }
+
+    @Test
+    public void getResponse_deleteSaveFails_restoresDeletedTask()
+            throws ErmActuallyException {
+        ArrayList<Task> initialTasks = new ArrayList<>(List.of(new Todo("borrow book")));
+        ErmActually ermActually = new ErmActually(new FailingStorage(initialTasks));
+
+        String response = ermActually.getResponse("delete 1");
+
+        assertEquals(" uhohhhh... I couldn't save your tasks.", response);
+        assertEquals(" here you go! your task list:\n 1. [T][ ] borrow book",
+                ermActually.getResponse("list"));
     }
 
     /** Creates an application backed by a temporary test file. */

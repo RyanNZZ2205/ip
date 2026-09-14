@@ -5,6 +5,7 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.Optional;
 
 import ermactually.ErmActuallyException;
@@ -134,6 +135,22 @@ public class Deadline extends Task {
      */
     public String toStorageString() {
         return byTime == null ? byDate.toString() : byDate + "T" + byTime;
+    }
+
+    /** Returns whether another deadline has the same description, date, and optional time. */
+    @Override
+    public boolean equals(Object other) {
+        if (!super.equals(other)) {
+            return false;
+        }
+        Deadline otherDeadline = (Deadline) other;
+        return byDate.equals(otherDeadline.byDate) && Objects.equals(byTime, otherDeadline.byTime);
+    }
+
+    /** Returns a hash based on the immutable deadline details. */
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), byDate, byTime);
     }
 
     /**

@@ -29,7 +29,7 @@ public class DialogBox extends HBox {
             fxmlLoader.setRoot(this);
             fxmlLoader.load();
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new IllegalStateException("The dialog-box interface resource could not be loaded.", e);
         }
 
         dialog.setText(text);

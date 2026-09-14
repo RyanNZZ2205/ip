@@ -2,6 +2,7 @@ package ermactually.task;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -62,6 +63,31 @@ public class Task {
      */
     public String getDescription() {
         return description;
+    }
+
+    /**
+     * Returns whether another task has the same type and user-supplied details.
+     * Completion status is deliberately excluded because it is mutable task state.
+     *
+     * @param other Object to compare with this task.
+     * @return {@code true} when both objects describe the same task.
+     */
+    @Override
+    public boolean equals(Object other) {
+        if (this == other) {
+            return true;
+        }
+        if (other == null || getClass() != other.getClass()) {
+            return false;
+        }
+        Task otherTask = (Task) other;
+        return description.equals(otherTask.description);
+    }
+
+    /** Returns a hash based on the immutable details used by {@link #equals(Object)}. */
+    @Override
+    public int hashCode() {
+        return Objects.hash(getClass(), description);
     }
 
     /**

@@ -61,6 +61,14 @@ public class ParserTest {
     }
 
     @Test
+    public void getCommandType_tabSeparatedCommands_returnsMatchingTypes() {
+        assertEquals(Parser.CommandType.FIND, Parser.getCommandType("find\tbook"));
+        assertEquals(Parser.CommandType.MARK, Parser.getCommandType("mark\t1"));
+        assertEquals(Parser.CommandType.DEADLINE,
+                Parser.getCommandType("deadline\treport /by 2026-09-15"));
+    }
+
+    @Test
     public void parseKeyword_validKeyword_returnsTrimmedKeyword() throws ErmActuallyException {
         assertEquals("read book", Parser.parseKeyword("find   read book   "));
     }
@@ -87,6 +95,7 @@ public class ParserTest {
     public void parseTaskIndex_surroundingWhitespace_returnsCorrectIndex()
             throws ErmActuallyException {
         assertEquals(2, Parser.parseTaskIndex("mark   3   "));
+        assertEquals(2, Parser.parseTaskIndex("mark\t3"));
     }
 
     @Test
@@ -148,6 +157,33 @@ public class ParserTest {
 
         assertEquals("please add in an ending date/time! its actually using /to",
                 exception.getMessage());
+    }
+
+    @Test
+    public void parseDeadline_flexibleWhitespace_returnsDeadline() throws ErmActuallyException {
+        assertEquals("[D][ ] submit report (by: Sep 15 2026)",
+                Parser.parseDeadline("deadline\tsubmit report\t/by\t2026-09-15").toString());
+    }
+
+    @Test
+    public void parseDeadline_duplicateSeparator_exceptionThrown() {
+        ErmActuallyException exception = assertThrows(
+                ErmActuallyException.class, () -> Parser.parseDeadline(
+                        "deadline submit report /by 2026-09-15 /by 2026-09-16"));
+
+        assertEquals("Please use exactly one /by for the deadline.", exception.getMessage());
+    }
+
+    @Test
+    public void parseEvent_duplicateOrReorderedSeparators_exceptionThrown() {
+        List<String> invalidCommands = List.of(
+                "event meeting /from 2026-09-15 /from 2026-09-16 /to 2026-09-17",
+                "event meeting /from 2026-09-15 /to 2026-09-16 /to 2026-09-17",
+                "event meeting /to 2026-09-16 /from 2026-09-15");
+
+        for (String command : invalidCommands) {
+            assertThrows(ErmActuallyException.class, () -> Parser.parseEvent(command));
+        }
     }
 
     /**
