@@ -1,6 +1,7 @@
 package ermactually;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
@@ -134,6 +135,95 @@ public class ErmActuallyTest {
     }
 
     @Test
+    public void getResponse_allTaskTypesAndSearches_returnsExpectedResponses() {
+        ErmActually ermActually = createErmActually();
+
+        String deadlineResponse = ermActually.getResponse("deadline submit /by 2026-09-14");
+        String eventResponse = ermActually.getResponse(
+                "event conference /from 2026-09-13 /to 2026-09-15");
+        String findResponse = ermActually.getResponse("find SUBMIT");
+        String onResponse = ermActually.getResponse("on 2026-09-14");
+
+        assertEquals(" Alright! I've added this new task:\n"
+                + "   [D][ ] submit (by: Sep 14 2026)\n"
+                + " Wow! you have 1 tasks in the list.", deadlineResponse);
+        assertEquals(" Alright! I've added this new task:\n"
+                + "   [E][ ] conference (from: Sep 13 2026 to: Sep 15 2026)\n"
+                + " Wow! you have 2 tasks in the list.", eventResponse);
+        assertEquals(" Here are the matching tasks in your list:\n"
+                + " 1. [D][ ] submit (by: Sep 14 2026)", findResponse);
+        assertEquals(" Here are the tasks occurring on 2026-09-14:\n"
+                + " 1. [D][ ] submit (by: Sep 14 2026)\n"
+                + " 2. [E][ ] conference (from: Sep 13 2026 to: Sep 15 2026)", onResponse);
+    }
+
+    @Test
+    public void getResponse_unmarkAndDelete_updatesListAndCommandTypes() {
+        ErmActually ermActually = createErmActually();
+        ermActually.getResponse("todo first");
+        ermActually.getResponse("todo second");
+        ermActually.getResponse("mark 2");
+
+        String unmarkResponse = ermActually.getResponse("unmark 2");
+        assertEquals(Parser.CommandType.UNMARK, ermActually.getCommandType());
+        String deleteResponse = ermActually.getResponse("delete 1");
+
+        assertEquals("oh? okay then I'll unmark it for you:\n  [T][ ] second", unmarkResponse);
+        assertEquals(" Noted. I've removed this task:\n"
+                + "   [T][ ] first\n"
+                + " Now you have 1 tasks in the list.", deleteResponse);
+        assertEquals(Parser.CommandType.DELETE, ermActually.getCommandType());
+        assertEquals(" Here are the tasks in your list:\n 1. [T][ ] second",
+                ermActually.getResponse("list"));
+    }
+
+    @Test
+    public void getResponse_byeAndUnknownInput_returnsExpectedResponsesAndTypes() {
+        ErmActually ermActually = createErmActually();
+
+        assertEquals(" uhohhhh... actually.. what are you saying??",
+                ermActually.getResponse("sing a song"));
+        assertEquals(Parser.CommandType.UNKNOWN, ermActually.getCommandType());
+        assertEquals("Farewell! Hope you stop by again soon!", ermActually.getResponse("bye"));
+        assertEquals(Parser.CommandType.BYE, ermActually.getCommandType());
+    }
+
+    @Test
+    public void getResponse_invalidParsedInput_returnsErrorAndUnknownType() {
+        ErmActually ermActually = createErmActually();
+
+        assertEquals(" uhohhhh... Please add a description for todo!",
+                ermActually.getResponse("todo"));
+        assertEquals(Parser.CommandType.UNKNOWN, ermActually.getCommandType());
+        assertEquals(" uhohhhh... Please provide a valid date in yyyy-MM-dd format.",
+                ermActually.getResponse("on Tuesday"));
+        assertEquals(Parser.CommandType.UNKNOWN, ermActually.getCommandType());
+    }
+
+    @Test
+    public void constructor_loadSucceeds_hasNoStartupError() {
+        assertNull(createErmActually().getStartupError());
+    }
+
+    @Test
+    public void constructor_loadFails_recordsStartupErrorAndUsesEmptyList() {
+        ErmActually ermActually = new ErmActually(new LoadFailingStorage());
+
+        assertEquals(" uhohhhh... I couldn't load your tasks.", ermActually.getStartupError());
+        assertEquals(" Here are the tasks in your list:\nWoohoo! No tasks found!",
+                ermActually.getResponse("list"));
+    }
+
+    @Test
+    public void getResponse_addSaveFails_returnsError() {
+        ErmActually ermActually = new ErmActually(new FailingStorage(new ArrayList<>()));
+
+        assertEquals(" uhohhhh... I couldn't save your tasks.",
+                ermActually.getResponse("todo read"));
+        assertEquals(Parser.CommandType.UNKNOWN, ermActually.getCommandType());
+    }
+
+    @Test
     public void getWelcomeMessage_returnsBannerAndGreeting() {
         ErmActually ermActually = createErmActually();
 
@@ -202,6 +292,18 @@ public class ErmActuallyTest {
         @Override
         public void save(TaskList tasks) throws ErmActuallyException {
             throw new ErmActuallyException("I couldn't save your tasks.");
+        }
+    }
+
+    /** Rejects loading so startup-error handling can be tested. */
+    private static class LoadFailingStorage extends Storage {
+        LoadFailingStorage() {
+            super(Path.of("unused-test-file.txt"));
+        }
+
+        @Override
+        public ArrayList<Task> load() throws ErmActuallyException {
+            throw new ErmActuallyException("I couldn't load your tasks.");
         }
     }
 }

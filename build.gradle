@@ -2,6 +2,7 @@ plugins {
     id 'java'
     id 'application'
     id 'checkstyle'
+    id 'jacoco'
     id 'com.gradleup.shadow' version '9.5.1'
 }
 
@@ -53,6 +54,28 @@ test {
         showCauses = true
         showStackTraces = true
         showStandardStreams = false
+    }
+}
+
+jacoco {
+    toolVersion = '0.8.14'
+}
+
+jacocoTestReport {
+    dependsOn test
+
+    classDirectories.setFrom(files(classDirectories.files.collect {
+        fileTree(dir: it, exclude: [
+                'ermactually/DialogBox*',
+                'ermactually/Launcher*',
+                'ermactually/Main*',
+                'ermactually/MainWindow*'
+        ])
+    }))
+
+    reports {
+        html.required = true
+        xml.required = true
     }
 }
 

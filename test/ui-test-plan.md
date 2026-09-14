@@ -8,6 +8,21 @@ Record all console user-interface test cases here. Run them with the project-loc
 - Use Java 25 for Java build and run commands.
 - Compare complete standard output. Line endings and one final trailing newline are normalized; all other whitespace is significant.
 
+## Manual GUI test matrix
+
+The JavaFX interface should be checked manually because its rendering depends on the operating system,
+display server, fonts, and scaling settings. For each available environment, launch the application,
+add each task type, mark and unmark a task, delete a task, search, sort, and restart to verify persistence.
+
+- Operating systems: Windows 11, macOS, and a common Linux desktop distribution.
+- Display sizes: 1024×768 and 1920×1080 or larger.
+- Display scaling: 100%, 150%, and 200% where supported.
+- OS display languages: English and Simplified Chinese.
+- Visual checks: startup messages, speaker images, response colors, text wrapping, scrollbar behavior,
+  keyboard submission, cleared input, minimum window size, and readable task dates and times.
+- Error checks: malformed commands and a malformed save file should produce a visible chatbot error without
+  freezing or closing the window.
+
 ## Test cases
 
 Add cases in the following format. The command must include any required input piping or redirection.
