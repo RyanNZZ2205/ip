@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 
 import org.junit.jupiter.api.Test;
 
@@ -108,6 +109,24 @@ public class DeadlineTest {
     }
 
     @Test
+    public void relevantDateAndTime_dateOnly_returnsDateAndEmptyTime()
+            throws ErmActuallyException {
+        Deadline deadline = new Deadline("submit report", "2026-08-25");
+
+        assertEquals(LocalDate.of(2026, 8, 25), deadline.getRelevantDate().orElseThrow());
+        assertTrue(deadline.getRelevantTime().isEmpty());
+    }
+
+    @Test
+    public void relevantDateAndTime_timedDeadline_returnsBothValues()
+            throws ErmActuallyException {
+        Deadline deadline = new Deadline("submit report", "2026-08-25 1900");
+
+        assertEquals(LocalDate.of(2026, 8, 25), deadline.getRelevantDate().orElseThrow());
+        assertEquals(LocalTime.of(19, 0), deadline.getRelevantTime().orElseThrow());
+    }
+
+    @Test
     public void constructor_descriptionWithWhitespace_trimsDescription()
             throws ErmActuallyException {
         Deadline deadline = new Deadline(
@@ -155,6 +174,11 @@ public class DeadlineTest {
     @Test
     public void constructor_invalidTime_exceptionThrown() {
         assertConstructorThrows("submit report", "2026-08-25 2500", INVALID_FORMAT_MESSAGE);
+    }
+
+    @Test
+    public void constructor_malformedStoredTime_exceptionThrown() {
+        assertConstructorThrows("submit report", "2026-08-25T19:99", INVALID_FORMAT_MESSAGE);
     }
 
     @Test
