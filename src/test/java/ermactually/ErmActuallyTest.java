@@ -42,7 +42,7 @@ public class ErmActuallyTest {
                 + " [D][X] earlier (by: Sep 09 2026)", markResponse);
 
         ErmActually restartedApplication = createErmActually();
-        assertEquals(" Here are the tasks in your list:\n"
+        assertEquals(" here you go! your task list:\n"
                 + " 1. [D][X] earlier (by: Sep 09 2026)\n"
                 + " 2. [D][ ] later (by: Sep 10 2026)\n"
                 + " 3. [T][ ] buy milk\n"
@@ -69,7 +69,7 @@ public class ErmActuallyTest {
 
         String response = ermActually.getResponse("sort");
 
-        assertEquals(" No tasks to sort.", response);
+        assertEquals(" actually, there is nothing to sort!", response);
         assertEquals(Parser.CommandType.SORT, ermActually.getCommandType());
     }
 
@@ -83,7 +83,7 @@ public class ErmActuallyTest {
 
         assertEquals(" uhohhhh... Please use: sort [asc|desc].", response);
         assertEquals(Parser.CommandType.UNKNOWN, ermActually.getCommandType());
-        assertEquals(" Here are the tasks in your list:\n"
+        assertEquals(" here you go! your task list:\n"
                 + " 1. [T][ ] buy milk\n"
                 + " 2. [D][ ] submit report (by: Sep 09 2026)",
                 ermActually.getResponse("list"));
@@ -113,7 +113,7 @@ public class ErmActuallyTest {
 
         assertEquals(" uhohhhh... I couldn't save your tasks.", response);
         assertEquals(Parser.CommandType.UNKNOWN, ermActually.getCommandType());
-        assertEquals(" Here are the tasks in your list:\n"
+        assertEquals(" here you go! your task list:\n"
                 + " 1. [T][ ] buy milk\n"
                 + " 2. [D][ ] submit report (by: Sep 09 2026)",
                 ermActually.getResponse("list"));
@@ -129,7 +129,7 @@ public class ErmActuallyTest {
         assertEquals(" Alright! I've added this new task:\n"
                 + "   [T][ ] borrow book\n"
                 + " Wow! you have 1 tasks in the list.", addResponse);
-        assertEquals(" Here are the tasks in your list:\n"
+        assertEquals(" here you go! your task list:\n"
                 + " 1. [T][ ] borrow book", listResponse);
     }
 
@@ -165,7 +165,7 @@ public class ErmActuallyTest {
 
         ErmActually secondInstance = createErmActually();
 
-        assertEquals(" Here are the tasks in your list:\n"
+        assertEquals(" here you go! your task list:\n"
                 + " 1. [T][ ] borrow book", secondInstance.getResponse("list"));
     }
 
@@ -175,8 +175,34 @@ public class ErmActuallyTest {
 
         String response = ermActually.getResponse("delete 1");
 
-        assertEquals(" uhohhhh... That task number does not exist.", response);
+        assertEquals(" uhohhhh... actually that task number doesn't exist!", response);
         assertEquals(Parser.CommandType.UNKNOWN, ermActually.getCommandType());
+    }
+
+    @Test
+    public void getResponse_emptyTaskFields_returnsTaskValidationErrors() {
+        ErmActually ermActually = createErmActually();
+
+        assertEquals(" uhohhhh... Please add a description of the todo!",
+                ermActually.getResponse("todo"));
+        assertEquals(" uhohhhh... please add in a description for the deadline!",
+                ermActually.getResponse("deadline /by 2026-08-25"));
+        assertEquals(" uhohhhh... please add in a deadline! its actually using /by",
+                ermActually.getResponse("deadline submit report /by"));
+        assertEquals(" uhohhhh... Please add in a description of the event!",
+                ermActually.getResponse("event /from 2026-08-25 /to 2026-08-26"));
+        assertEquals(" uhohhhh... The event start cannot be empty.",
+                ermActually.getResponse("event meeting /from /to 2026-08-26"));
+        assertEquals(" uhohhhh... The event end cannot be empty.",
+                ermActually.getResponse("event meeting /from 2026-08-25 /to"));
+    }
+
+    @Test
+    public void getResponse_unknownCommand_returnsUpdatedError() {
+        ErmActually ermActually = createErmActually();
+
+        assertEquals(" uhohhhh... erm actually.. what are you trying to say??",
+                ermActually.getResponse("hello"));
     }
 
     /** Creates an application backed by a temporary test file. */

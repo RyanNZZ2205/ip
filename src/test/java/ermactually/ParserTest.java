@@ -14,7 +14,7 @@ import ermactually.task.SortDirection;
  */
 public class ParserTest {
     private static final String INVALID_TASK_NUMBER_MESSAGE =
-            "Please provide a valid task number.";
+            "actually you need to give me a valid task number!";
     private static final String INVALID_SORT_MESSAGE = "Please use: sort [asc|desc].";
 
     @Test
@@ -70,7 +70,7 @@ public class ParserTest {
         ErmActuallyException exception =
                 assertThrows(ErmActuallyException.class, () -> Parser.parseKeyword("find   "));
 
-        assertEquals("Please provide a keyword to find.", exception.getMessage());
+        assertEquals("actually you have to give me a keyword to find!", exception.getMessage());
     }
 
     @Test
@@ -122,6 +122,32 @@ public class ParserTest {
     @Test
     public void parseTaskIndex_multipleArguments_exceptionThrown() {
         assertInvalidTaskNumber("mark 1 2");
+    }
+
+    @Test
+    public void parseDeadline_missingBy_exceptionThrown() {
+        ErmActuallyException exception = assertThrows(ErmActuallyException.class, () ->
+                Parser.parseDeadline("deadline submit report"));
+
+        assertEquals("please add in a deadline! its actually using /by", exception.getMessage());
+    }
+
+    @Test
+    public void parseEvent_missingFrom_exceptionThrown() {
+        ErmActuallyException exception = assertThrows(ErmActuallyException.class, () ->
+                Parser.parseEvent("event meeting /to 2026-08-26"));
+
+        assertEquals("please add in a starting date/time! its actually using /from",
+                exception.getMessage());
+    }
+
+    @Test
+    public void parseEvent_missingTo_exceptionThrown() {
+        ErmActuallyException exception = assertThrows(ErmActuallyException.class, () ->
+                Parser.parseEvent("event meeting /from 2026-08-25"));
+
+        assertEquals("please add in an ending date/time! its actually using /to",
+                exception.getMessage());
     }
 
     /**

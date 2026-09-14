@@ -81,7 +81,7 @@ public class Parser {
                 : "parseKeyword must receive a find command";
         String keyword = command.substring("find".length()).trim();
         if (keyword.isEmpty()) {
-            throw new ErmActuallyException("Please provide a keyword to find.");
+            throw new ErmActuallyException("actually you have to give me a keyword to find!");
         }
         return keyword;
     }
@@ -98,11 +98,11 @@ public class Parser {
         try {
             int taskNumber = Integer.parseInt(argument);
             if (taskNumber < 1) {
-                throw new ErmActuallyException("Please provide a valid task number.");
+                throw new ErmActuallyException("actually you need to give me a valid task number!");
             }
             return taskNumber - 1;
         } catch (NumberFormatException e) {
-            throw new ErmActuallyException("Please provide a valid task number.");
+            throw new ErmActuallyException("actually you need to give me a valid task number!");
         }
     }
 
@@ -126,9 +126,6 @@ public class Parser {
         assert getCommandType(command) == CommandType.TODO
                 : "parseTodo must receive a todo command";
         String description = command.substring("todo".length()).trim();
-        if (description.isEmpty()) {
-            throw new ErmActuallyException("Please add a description for todo!");
-        }
         return new Todo(description);
     }
 
@@ -137,19 +134,13 @@ public class Parser {
         assert getCommandType(command) == CommandType.DEADLINE
                 : "parseDeadline must receive a deadline command";
         String details = command.substring("deadline".length()).trim();
-        String[] parts = details.split(" /by", 2);
+        String[] parts = details.split("/by", 2);
         if (parts.length != 2) {
-            throw new ErmActuallyException("Please add a /by for the deadline.");
+            throw new ErmActuallyException("please add in a deadline! its actually using /by");
         }
 
         String description = parts[0].trim();
         String by = parts[1].trim();
-        if (description.isEmpty()) {
-            throw new ErmActuallyException("Please add a description for deadline!");
-        }
-        if (by.isEmpty()) {
-            throw new ErmActuallyException("Please add a deadline using /by.");
-        }
         return new Deadline(description, by);
     }
 
@@ -160,23 +151,19 @@ public class Parser {
         String details = command.substring("event".length()).trim();
         String[] fromSplit = details.split("/from", 2);
         if (fromSplit.length != 2) {
-            throw new ErmActuallyException("Please add a /from for the event!");
+            throw new ErmActuallyException(
+                    "please add in a starting date/time! its actually using /from");
         }
 
         String description = fromSplit[0].trim();
         String[] toSplit = fromSplit[1].split("/to", 2);
         if (toSplit.length != 2) {
-            throw new ErmActuallyException("Please add a /to and /from for the event!");
+            throw new ErmActuallyException(
+                    "please add in an ending date/time! its actually using /to");
         }
 
         String from = toSplit[0].trim();
         String to = toSplit[1].trim();
-        if (description.isEmpty()) {
-            throw new ErmActuallyException("Please add a description for this event!");
-        }
-        if (from.isEmpty() || to.isEmpty()) {
-            throw new ErmActuallyException("Event /to and /from details cannot be empty! Please add them in.");
-        }
         return new Event(description, from, to);
     }
 

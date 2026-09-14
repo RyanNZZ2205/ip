@@ -51,7 +51,7 @@ public class Ui {
 
     /** Formats every task with its one-based list number. */
     String formatTaskList(TaskList tasks) {
-        StringBuilder response = new StringBuilder(" Here are the tasks in your list:");
+        StringBuilder response = new StringBuilder(" here you go! your task list:");
         if (tasks.isEmpty()) {
             response.append("\nWoohoo! No tasks found!");
         } else {
@@ -83,7 +83,7 @@ public class Ui {
 
     /** Formats the successful response for sorting an empty task list. */
     String formatNoTasksToSort() {
-        return " No tasks to sort.";
+        return " actually, there is nothing to sort!";
     }
 
     /** Formats tasks whose descriptions contain the requested keyword. */
@@ -119,7 +119,7 @@ public class Ui {
                     .append(tasks.get(index));
         }
         if (matchingIndexes.isEmpty()) {
-            response.append("\n No deadlines or events found.");
+            response.append("\n I didn't find any deadlines or events!");
         }
         return response.toString();
     }
@@ -143,7 +143,7 @@ public class Ui {
 
     /** Formats confirmation that a task was deleted. */
     String formatTaskDeleted(Task task, int taskCount) {
-        return " Noted. I've removed this task:\n"
+        return " Alright! I've removed this task:\n"
                 + "   " + task + "\n"
                 + " Now you have " + taskCount + " tasks in the list.";
     }
