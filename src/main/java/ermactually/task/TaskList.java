@@ -126,7 +126,7 @@ public class TaskList implements Iterable<Task> {
     }
 
     /**
-     * Finds the original zero-based indexes of deadlines and events occurring on a date.
+     * Finds the original zero-based indexes of tasks occurring on a date.
      *
      * @param date Date to search for.
      * @return Matching indexes in task-list order.
@@ -134,12 +134,7 @@ public class TaskList implements Iterable<Task> {
     public ArrayList<Integer> findIndexesOn(LocalDate date) {
         ArrayList<Integer> indexes = new ArrayList<>();
         for (int i = 0; i < tasks.size(); i++) {
-            Task task = tasks.get(i);
-            boolean occursOnDate = task instanceof Deadline
-                    && ((Deadline) task).occursOn(date);
-            occursOnDate = occursOnDate || task instanceof Event
-                    && ((Event) task).occursOn(date);
-            if (occursOnDate) {
+            if (tasks.get(i).occursOn(date)) {
                 indexes.add(i);
             }
         }

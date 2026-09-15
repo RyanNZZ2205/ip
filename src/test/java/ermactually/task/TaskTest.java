@@ -4,6 +4,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.time.LocalDate;
+
 import org.junit.jupiter.api.Test;
 
 /** Tests state and default chronological behavior shared by all tasks. */
@@ -18,6 +20,7 @@ public class TaskTest {
         assertEquals("[T][ ] read book", task.toString());
         assertTrue(task.getRelevantDate().isEmpty());
         assertTrue(task.getRelevantTime().isEmpty());
+        assertFalse(task.occursOn(LocalDate.of(2026, 9, 15)));
     }
 
     @Test

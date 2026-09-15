@@ -118,6 +118,7 @@ public class Event extends Task {
      * @param date Date to compare with the event's inclusive start and end dates.
      * @return {@code true} when the date is within the event's date range.
      */
+    @Override
     public boolean occursOn(LocalDate date) {
         return !date.isBefore(fromDate) && !date.isAfter(toDate);
     }

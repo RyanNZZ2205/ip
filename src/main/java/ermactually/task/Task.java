@@ -109,6 +109,16 @@ public class Task {
     }
 
     /**
+     * Returns whether this task occurs on the requested date.
+     *
+     * @param date Date to compare with this task.
+     * @return {@code false} because a basic task has no date.
+     */
+    public boolean occursOn(LocalDate date) {
+        return false;
+    }
+
+    /**
      * Returns this task in the format used by the list command.
      *
      * @return The task status and description.

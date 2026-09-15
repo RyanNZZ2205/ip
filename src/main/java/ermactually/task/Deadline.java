@@ -112,6 +112,7 @@ public class Deadline extends Task {
      * @param date Date to compare with this deadline.
      * @return {@code true} when this deadline is on the requested date.
      */
+    @Override
     public boolean occursOn(LocalDate date) {
         return byDate.equals(date);
     }
