@@ -29,6 +29,7 @@ public class Main extends Application {
             AnchorPane root = fxmlLoader.load();
             Scene scene = new Scene(root);
             stage.setScene(scene);
+            stage.setTitle("ErmActually");
             stage.setMinHeight(220);
             stage.setMinWidth(417);
             fxmlLoader.<MainWindow>getController().setErmActually(ermActually);
