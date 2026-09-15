@@ -114,45 +114,11 @@ public class ErmActually {
                 case ON:
                     return ui.formatTasksOnDate(tasks, Parser.parseDate(command));
                 case MARK:
-                    int markIndex = Parser.parseTaskIndex(command);
-                    boolean wasMarked = tasks.get(markIndex).isDone();
-                    tasks.mark(markIndex);
-                    assert tasks.get(markIndex).isDone()
-                            : "A marked task must be complete";
-                    try {
-                        saveTasks();
-                    } catch (ErmActuallyException e) {
-                        if (!wasMarked) {
-                            tasks.unmark(markIndex);
-                        }
-                        throw e;
-                    }
-                    return ui.formatTaskMarked(tasks.get(markIndex));
+                    return markTask(command);
                 case UNMARK:
-                    int unmarkIndex = Parser.parseTaskIndex(command);
-                    boolean wasUnmarked = !tasks.get(unmarkIndex).isDone();
-                    tasks.unmark(unmarkIndex);
-                    assert !tasks.get(unmarkIndex).isDone()
-                            : "An unmarked task must be incomplete";
-                    try {
-                        saveTasks();
-                    } catch (ErmActuallyException e) {
-                        if (!wasUnmarked) {
-                            tasks.mark(unmarkIndex);
-                        }
-                        throw e;
-                    }
-                    return ui.formatTaskUnmarked(tasks.get(unmarkIndex));
+                    return unmarkTask(command);
                 case DELETE:
-                    int deleteIndex = Parser.parseTaskIndex(command);
-                    Task removedTask = tasks.delete(deleteIndex);
-                    try {
-                        saveTasks();
-                    } catch (ErmActuallyException e) {
-                        tasks.add(deleteIndex, removedTask);
-                        throw e;
-                    }
-                    return ui.formatTaskDeleted(removedTask, tasks.size());
+                    return deleteTask(command);
                 case TODO:
                     return addTask(Parser.parseTodo(command));
                 case DEADLINE:
@@ -160,14 +126,7 @@ public class ErmActually {
                 case EVENT:
                     return addTask(Parser.parseEvent(command));
                 case SORT:
-                    SortDirection direction = Parser.parseSortDirection(command);
-                    if (tasks.isEmpty()) {
-                        return ui.formatNoTasksToSort();
-                    }
-                    TaskList sortedTasks = tasks.createChronologicallySorted(direction);
-                    storage.save(sortedTasks);
-                    tasks = sortedTasks;
-                    return ui.formatSortedTaskList(tasks, direction);
+                    return sortTasks(command);
                 default:
                     return ui.formatError("erm actually.. what are you trying to say??");
             }
@@ -178,6 +137,65 @@ public class ErmActually {
             commandType = Parser.CommandType.UNKNOWN;
             return ui.formatError("actually that task number doesn't exist!");
         }
+    }
+
+    /** Marks and saves the requested task, restoring its original state if saving fails. */
+    private String markTask(String command) throws ErmActuallyException {
+        int taskIndex = Parser.parseTaskIndex(command);
+        boolean wasAlreadyMarked = tasks.get(taskIndex).isDone();
+        tasks.mark(taskIndex);
+        assert tasks.get(taskIndex).isDone() : "A marked task must be complete";
+        try {
+            saveTasks();
+        } catch (ErmActuallyException e) {
+            if (!wasAlreadyMarked) {
+                tasks.unmark(taskIndex);
+            }
+            throw e;
+        }
+        return ui.formatTaskMarked(tasks.get(taskIndex));
+    }
+
+    /** Unmarks and saves the requested task, restoring its original state if saving fails. */
+    private String unmarkTask(String command) throws ErmActuallyException {
+        int taskIndex = Parser.parseTaskIndex(command);
+        boolean wasAlreadyUnmarked = !tasks.get(taskIndex).isDone();
+        tasks.unmark(taskIndex);
+        assert !tasks.get(taskIndex).isDone() : "An unmarked task must be incomplete";
+        try {
+            saveTasks();
+        } catch (ErmActuallyException e) {
+            if (!wasAlreadyUnmarked) {
+                tasks.mark(taskIndex);
+            }
+            throw e;
+        }
+        return ui.formatTaskUnmarked(tasks.get(taskIndex));
+    }
+
+    /** Deletes and saves the requested task, restoring it at its original position if saving fails. */
+    private String deleteTask(String command) throws ErmActuallyException {
+        int taskIndex = Parser.parseTaskIndex(command);
+        Task removedTask = tasks.delete(taskIndex);
+        try {
+            saveTasks();
+        } catch (ErmActuallyException e) {
+            tasks.add(taskIndex, removedTask);
+            throw e;
+        }
+        return ui.formatTaskDeleted(removedTask, tasks.size());
+    }
+
+    /** Sorts and saves the task list, leaving the in-memory order unchanged if saving fails. */
+    private String sortTasks(String command) throws ErmActuallyException {
+        SortDirection direction = Parser.parseSortDirection(command);
+        if (tasks.isEmpty()) {
+            return ui.formatNoTasksToSort();
+        }
+        TaskList sortedTasks = tasks.createChronologicallySorted(direction);
+        storage.save(sortedTasks);
+        tasks = sortedTasks;
+        return ui.formatSortedTaskList(tasks, direction);
     }
 
     /** Returns an error encountered while loading tasks, or {@code null} if loading succeeded. */
