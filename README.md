@@ -1,6 +1,6 @@
-# ErmActually project template
+# ErmActually
 
-This is a project template for a greenfield Java project. It's named after the Java mascot _Duke_. Given below are instructions on how to use it.
+ErmActually is a desktop chatbot for managing todos, deadlines, and events. The instructions below explain how to set up the project for development.
 
 ## Setting up in Intellij
 

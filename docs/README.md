@@ -1,60 +1,159 @@
 # ErmActually User Guide
 
-// Update the title above to match the actual product name
+ErmActually is a friendly desktop chatbot that helps you record and manage todos, deadlines, and events using short text commands.
 
-// Product screenshot goes here
+## Quick start
 
-// Product intro goes here
+1. Install [Java 25](https://www.oracle.com/java/technologies/downloads/) on your computer.
+2. Download `ermactually.jar` from the [latest release](https://github.com/RyanNZZ2205/ip/releases/latest).
+3. Put the JAR file in the folder where you want ErmActually to keep its data.
+4. Open a terminal in that folder and run:
 
-## Sorting tasks chronologically
+   ```shell
+   java -jar ermactually.jar
+   ```
 
-Use `sort [asc|desc]` to reorder and immediately save the current task list. `sort` defaults to
-ascending order and is equivalent to `sort asc`. Spaces and tabs may separate `sort` from its
-optional direction.
+5. Enter a command in the text box, then press <kbd>Enter</kbd> or select **Send**.
 
-- Deadlines are ordered by their due date and optional due time.
-- Events are ordered by their start date and optional start time. Their end values do not affect sorting,
-  even when the start and end use different date/time precision.
-- Date-only tasks appear before timed tasks on the same date in both directions.
-- Todos appear after every dated task in both directions.
-- Tasks with equal sort values retain their existing relative order. Completion status does not affect sorting.
+ErmActually saves your tasks automatically in `data/ErmActually.txt`. Your tasks will be restored the next time you start the application from the same folder.
 
-For example, `sort desc` places later dates before earlier dates and displays the complete, newly numbered list:
+> [!TIP]
+> Commands and their keywords, such as `todo` and `/by`, should be typed in lowercase.
+
+## Command format
+
+- Words in `UPPER_CASE` are values you provide. Do not type the surrounding angle brackets.
+- Items in square brackets are optional.
+- Dates use `yyyy-MM-dd`, for example `2026-09-15`.
+- Times use the 24-hour `HHmm` format, for example `0900` or `1730`.
+- Task numbers come from `list` and can change after deleting or sorting tasks.
+
+## Features
+
+### Add a todo: `todo`
+
+Use a todo for a task without a date or time.
 
 ```text
- Here are the tasks in your list, sorted in descending order:
- 1. [E][ ] conference (from: Sep 10 2026 9:00 AM to: Sep 10 2026 5:00 PM)
- 2. [D][ ] pay bill (by: Sep 09 2026)
- 3. [T][ ] buy milk
+todo <DESCRIPTION>
 ```
 
-Sorting changes the task numbers used by commands such as `mark`, `unmark`, and `delete`, and the new order is
-restored after restarting the application. Sorting is a one-time operation: tasks added later are appended until
-you run `sort` again. A successful sort of any non-empty list is saved, even when its order does not change; this
-also converts a loaded legacy save file to the current V2 format.
+Example: `todo borrow a book`
 
-An empty list returns ` No tasks to sort.`. Unsupported values and extra arguments, such as `sort ASC`,
-`sort date`, or `sort asc desc`, return ` uhohhhh... Please use: sort [asc|desc].` and do not change the list.
+### Add a deadline: `deadline`
 
-## Adding deadlines
+Use a deadline for a task that must be completed by a date. Adding a time is optional.
 
-// Describe the action and its outcome.
-
-// Give examples of usage
-
-Example: `keyword (optional arguments)`
-
-// A description of the expected outcome goes here
-
-```
-expected output
+```text
+deadline <DESCRIPTION> /by <DATE> [TIME]
 ```
 
-## Feature ABC
+Examples:
 
-// Feature details
+- `deadline submit report /by 2026-09-15`
+- `deadline submit report /by 2026-09-15 1730`
 
+### Add an event: `event`
 
-## Feature XYZ
+Use an event for something with a start and an end. You can enter dates only or include times for both endpoints.
 
-// Feature details
+```text
+event <DESCRIPTION> /from <DATE> [TIME] /to <DATE> [TIME]
+```
+
+Examples:
+
+- `event holiday /from 2026-09-15 /to 2026-09-18`
+- `event project meeting /from 2026-09-15 1400 /to 2026-09-15 1600`
+
+The end must be after the start. For an event that starts and ends on the same date, provide times for both endpoints or for neither endpoint.
+
+### View all tasks: `list`
+
+```text
+list
+```
+
+Each task is displayed with a number and status:
+
+- `[T]`, `[D]`, and `[E]` mean todo, deadline, and event.
+- `[X]` means completed; `[ ]` means incomplete.
+
+### Mark or unmark a task
+
+Use the task number shown by `list`.
+
+```text
+mark <TASK_NUMBER>
+unmark <TASK_NUMBER>
+```
+
+Examples: `mark 2` and `unmark 2`
+
+### Delete a task: `delete`
+
+```text
+delete <TASK_NUMBER>
+```
+
+Example: `delete 3`
+
+### Find tasks by description: `find`
+
+Searches are case-insensitive and match the keyword anywhere in a description.
+
+```text
+find <KEYWORD>
+```
+
+Example: `find book`
+
+### Find tasks on a date: `on`
+
+This finds deadlines on the given date and events that include the date. Event start and end dates are included.
+
+```text
+on <DATE>
+```
+
+Example: `on 2026-09-15`
+
+### Sort tasks chronologically: `sort`
+
+```text
+sort [asc|desc]
+```
+
+- `sort` and `sort asc` put earlier dated tasks first.
+- `sort desc` puts later dated tasks first.
+- Date-only tasks come before timed tasks on the same date.
+- Todos remain after dated tasks.
+- Tasks with the same date and time keep their relative order.
+
+Sorting immediately saves the new order and changes the task numbers used by `mark`, `unmark`, and `delete`.
+
+### Exit ErmActually: `bye`
+
+```text
+bye
+```
+
+ErmActually displays a farewell message. In the desktop interface, close the window when you are finished.
+
+## Command summary
+
+| Purpose | Command |
+| --- | --- |
+| Add a todo | `todo <DESCRIPTION>` |
+| Add a deadline | `deadline <DESCRIPTION> /by <DATE> [TIME]` |
+| Add an event | `event <DESCRIPTION> /from <DATE> [TIME] /to <DATE> [TIME]` |
+| View all tasks | `list` |
+| Mark a task complete | `mark <TASK_NUMBER>` |
+| Mark a task incomplete | `unmark <TASK_NUMBER>` |
+| Delete a task | `delete <TASK_NUMBER>` |
+| Find by description | `find <KEYWORD>` |
+| Find by date | `on <DATE>` |
+| Sort tasks | `sort [asc|desc]` |
+| Say goodbye | `bye` |
+
+If ErmActually rejects a command, check its spelling, required separators, date format, and task number before trying again.
