@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Locale;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import ermactually.ErmActuallyException;
 
@@ -115,14 +117,12 @@ public class TaskList implements Iterable<Task> {
      */
     public ArrayList<Integer> findIndexes(String keyword) {
         String normalizedKeyword = keyword.toLowerCase(Locale.ROOT);
-        ArrayList<Integer> indexes = new ArrayList<>();
-        for (int i = 0; i < tasks.size(); i++) {
-            String normalizedDescription = tasks.get(i).getDescription().toLowerCase(Locale.ROOT);
-            if (normalizedDescription.contains(normalizedKeyword)) {
-                indexes.add(i);
-            }
-        }
-        return indexes;
+        return IntStream.range(0, tasks.size())
+                .filter(index -> tasks.get(index).getDescription()
+                        .toLowerCase(Locale.ROOT)
+                        .contains(normalizedKeyword))
+                .boxed()
+                .collect(Collectors.toCollection(ArrayList::new));
     }
 
     /**
@@ -132,13 +132,10 @@ public class TaskList implements Iterable<Task> {
      * @return Matching indexes in task-list order.
      */
     public ArrayList<Integer> findIndexesOn(LocalDate date) {
-        ArrayList<Integer> indexes = new ArrayList<>();
-        for (int i = 0; i < tasks.size(); i++) {
-            if (tasks.get(i).occursOn(date)) {
-                indexes.add(i);
-            }
-        }
-        return indexes;
+        return IntStream.range(0, tasks.size())
+                .filter(index -> tasks.get(index).occursOn(date))
+                .boxed()
+                .collect(Collectors.toCollection(ArrayList::new));
     }
 
     /** Allows collaborators such as Storage to process each task without exposing the list. */
