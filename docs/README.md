@@ -2,6 +2,8 @@
 
 ErmActually is a friendly desktop chatbot that helps you record and manage todos, deadlines, and events using short text commands.
 
+![ErmActually graphical interface showing task commands and responses](Ui.png)
+
 ## Quick start
 
 1. Install [Java 25](https://www.oracle.com/java/technologies/downloads/) on your computer.
